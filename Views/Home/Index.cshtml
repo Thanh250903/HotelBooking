@@ -1,8 +1,44 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model List<HotelApp.Models.Hotel.Hotel>
+<partial name="_Notification" />
+<div class="row pt-4 pb-4">
+    <div class="col-6">
+    <h2> List of hotel</h2>
+    </div>
+    <div class="col-6">
+        <a asp-controller="Home" asp-action="CreateHotel" class="btn btn-primary"> Create a Hotel </a>
+    </div>
+</div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div >
+    <table class="table table-bordered">
+         <thread>
+             <tr>
+                    <td>HotelName</td>
+                    <td>Description</td>
+                    <td>City</td>
+                    <td>NumberPhone</td>
+                    <td>AverangeRating</td>
+                    <td>Lattitube</td>
+                    <td>Longitude</td>
+             </tr >
+         </thread>    
+         <tbody>
+            @foreach (var hotel in Model)
+            {
+                <tr>
+                       <td>@hotel.HotelName</td>
+                       <td>@hotel.Description</td>
+                       <td>@hotel.City</td>
+                       <td>@hotel.NumberPhone</td>
+                       <td>@hotel.AverangeRating</td>
+                       <td>@hotel.Lattitube</td>
+                       <td>@hotel.Longitude</td>
+                       <td>
+                           <a asp-controller="Home" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary"> Edit </a>
+                           <a asp-controller="Home" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger"> Delete </a>
+                       </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
