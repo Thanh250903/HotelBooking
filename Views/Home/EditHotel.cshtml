@@ -1,0 +1,49 @@
+﻿@model HotelApp.Models.Hotel.Hotel
+<h1>Edit Hotel</h1>
+<form method="post">
+    <div class="border m-3 pt-4">
+        <div class="mb-3 row">
+            <label asp-for="HotelName"></label>
+            <input asp-for="HotelName" />
+            <span asp-validation-for="HotelName" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="Description"></label>
+            <input asp-for="Description" />
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="City"></label>
+            <input asp-for="City" />
+            <span asp-validation-for="City" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="NumberPhone"></label>
+            <input asp-for="NumberPhone" />
+            <span asp-validation-for="NumberPhone" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="AverangeRating"></label>
+            <input asp-for="AverangeRating" />
+            <span asp-validation-for="AverangeRating" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="Lattitube"></label>
+            <input asp-for="Lattitube" />
+            <span asp-validation-for="Lattitube" class="text-danger"></span>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="Longitude"></label>
+            <input asp-for="Longitude" />
+            <span asp-validation-for="Longitude" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Edit</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-primary"> Back to list</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
