@@ -44,6 +44,10 @@ namespace HotelApp.Controllers
 		{
 			return View();
 		}
+		public IActionResult Contact()
+		{
+			return View();
+		}
 
 		[HttpPost]
 		public IActionResult CreateHotel(Hotel hotel)
