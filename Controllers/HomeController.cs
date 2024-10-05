@@ -36,6 +36,18 @@ namespace HotelApp.Controllers
 		{
 			return View();
 		}
+		public IActionResult AboutUs()
+		{
+			return View();
+		}
+		public IActionResult Services()
+		{
+			return View();
+		}
+		public IActionResult Contact()
+		{
+			return View();
+		}
 
 		[HttpPost]
 		public IActionResult CreateHotel(Hotel hotel)
