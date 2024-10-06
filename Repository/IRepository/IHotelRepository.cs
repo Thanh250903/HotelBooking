@@ -1,4 +1,4 @@
-﻿using HotelApp.Models;
+﻿
 using HotelApp.Models.Hotel;
 using HotelApp.Repository.IRepository;
 
