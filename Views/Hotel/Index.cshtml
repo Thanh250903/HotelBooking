@@ -2,41 +2,46 @@
 <partial name="_Notification" />
 <div class="row pt-4 pb-4">
     <div class="col-6">
-    <h2> List of hotel</h2>
+        <h2>List of Hotels</h2>
     </div>
-    <div class="col-6">
-        <a asp-controller="Hotel" asp-action="CreateHotel" class="btn btn-primary"> Create a Hotel </a>
+    <div class="col-6 text-right">
+        <a asp-controller="Hotel" asp-action="CreateHotel" class="btn btn-primary">Create a Hotel</a>
     </div>
 </div>
 
-<div >
-    <table class="table table-bordered">
-         <thread>
-             <tr>
-                    <td>HotelName</td>
-                    <td>Description</td>
-                    <td>City</td>
-                    <td>NumberPhone</td>
-                    <td>AverangeRating</td>
-                    <td>Lattitube</td>
-                    <td>Longitude</td>
-             </tr >
-         </thread>    
-         <tbody>
+<div>
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Hotel Name</th>
+                <th>Description</th>
+                <th>City</th>
+                <th>Phone Number</th>
+                <th>Average Rating</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
             @foreach (var hotel in Model)
             {
                 <tr>
-                       <td>@hotel.HotelName</td>
-                       <td>@hotel.Description</td>
-                       <td>@hotel.City</td>
-                       <td>@hotel.NumberPhone</td>
-                       <td>@hotel.AverangeRating</td>
-                       <td>@hotel.Lattitube</td>
-                       <td>@hotel.Longitude</td>
-                       <td>
-                           <a asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary"> Edit </a>
-                           <a asp-controller="Hotel" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger"> Delete </a>
-                       </td>
+                    <td>@hotel.HotelName</td>
+                    <td>@hotel.Description</td>
+                    <td>@hotel.City</td>
+                    <td>@hotel.NumberPhone</td>
+                    <td>@hotel.AverangeRating</td>
+                    <td>@hotel.Lattitube</td>
+                    <td>@hotel.Longitude</td>
+                    <td>
+                        <a asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a asp-controller="Hotel" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>

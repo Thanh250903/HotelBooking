@@ -2,6 +2,7 @@
 
 <h1 class="text-center my-4">Edit Hotel</h1>
 <form method="post" class="container">
+    <input type="hidden" asp-for="HotelId" />
     <div class="border p-4 rounded shadow-sm">
         <div class="mb-3 row">
             <label asp-for="HotelName" class="col-sm-2 col-form-label"></label>
@@ -57,7 +58,7 @@
                 <button type="submit" class="btn btn-primary w-100">Edit</button>
             </div>
             <div class="col">
-                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary w-100">Back to list</a>
+                <a asp-controller="Hotel" asp-action="Index" class="btn btn-secondary w-100">Back to list</a>
             </div>
             <div class="col">
                 <button type="reset" class="btn btn-warning w-100">Reset all</button>

@@ -18,7 +18,7 @@ namespace HotelApp.Models.Hotel
         [Required]
         public int NumberPhone { get; set; } // sđt của khách sạn
         [NotMapped] // kh lưu được ở trong CSDL và khi thêm khách sạn sẽ kh hiện trường này lên, nó sẽ lấy dữ liệu từ HotelReview
-        public double AverangeRating
+        public double AverangeRating 
         {
             get
             {

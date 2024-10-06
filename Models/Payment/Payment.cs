@@ -1,6 +1,5 @@
 ﻿
 using HotelApp.Models.Hotel;
-using HotelApp.Models.Tour;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -20,9 +19,6 @@ namespace HotelApp.Models.Others
         public int? RoomBookingId { get; set; } // mã thuê phòng
         [ForeignKey("RoomId")]
         public RoomBooking? RoomBooking { get; set; } // liên kết với khóa ngoại để bt thuê phòng nào
-        public int? TourBookingId { get; set; } // mã chuyến đi
-        [ForeignKey("TourBookingId")]
-        public TourBooking? TourBooking { get; set; } // liên kết với khóa ngoại để bt chuyến đi nào
         [Required]
         public DateTime PaymentTime { get; set; } // thời gian thanh toán
         [Required]
@@ -43,8 +39,7 @@ namespace HotelApp.Models.Others
         public PaymenMethod Method { get; set; }
         public enum BookingType // đặt phòng hay là chuyến đi
         {
-            Room, 
-            Tour
+            Room
         }
         [Required]
         public BookingType Status { get; set; }
