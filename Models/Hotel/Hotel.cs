@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HotelApp.Models.Hotel
@@ -32,9 +33,10 @@ namespace HotelApp.Models.Hotel
         public double Lattitube { get; set; } // kinh độ
         [Required]
         public double Longitude { get; set; } // vĩ độ
+        [ValidateNever]
+        public string? ImageUrl {  get; set; } // đường dẫn ảnh
         public ICollection<Room>? Rooms { get; set; } // tùy thuộc vào tình trạng phòng để quản lý phòng dễ dàng hơn, cho phép đặt phòng trực tuyến và chọn phòng như ý muốn
         public ICollection<RoomBooking>? RoomBookings { get; set; } // set với RoomBooking
-        public ICollection<HotelImage>? HotelImages { get; set; } // set với HotelImage
         public ICollection<HotelReview>? HotelReviews { get; set; } // danh sách về các đánh giá của khách sạn
     }
 }
