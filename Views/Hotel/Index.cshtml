@@ -40,6 +40,10 @@
                         {
                             <img src="@hotel.ImageUrl" alt="Hotel Image" style="width: 100px; height: auto;" />
                         }
+                        else
+                        {
+                            <p>The image not available</p>
+                        }
                     </td>
                     <td>
                         <a asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary btn-sm">
