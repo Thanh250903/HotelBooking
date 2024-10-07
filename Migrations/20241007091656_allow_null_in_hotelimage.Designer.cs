@@ -4,6 +4,7 @@ using HotelApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241007091656_allow_null_in_hotelimage")]
+    partial class allow_null_in_hotelimage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,9 +46,6 @@ namespace HotelApp.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double>("Lattitube")
                         .HasColumnType("float");
 
@@ -58,6 +58,28 @@ namespace HotelApp.Migrations
                     b.HasKey("HotelId");
 
                     b.ToTable("Hotels");
+                });
+
+            modelBuilder.Entity("HotelApp.Models.Hotel.HotelImage", b =>
+                {
+                    b.Property<int>("HotelImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("HotelImageId"));
+
+                    b.Property<int>("HotelId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UrlImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("HotelImageId");
+
+                    b.HasIndex("HotelId");
+
+                    b.ToTable("HotelImages");
                 });
 
             modelBuilder.Entity("HotelApp.Models.Hotel.HotelReview", b =>
@@ -308,6 +330,17 @@ namespace HotelApp.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("HotelApp.Models.Hotel.HotelImage", b =>
+                {
+                    b.HasOne("HotelApp.Models.Hotel.Hotel", "Hotel")
+                        .WithMany("HotelImages")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
             modelBuilder.Entity("HotelApp.Models.Hotel.HotelReview", b =>
                 {
                     b.HasOne("HotelApp.Models.Hotel.Hotel", "Hotel")
@@ -389,6 +422,8 @@ namespace HotelApp.Migrations
 
             modelBuilder.Entity("HotelApp.Models.Hotel.Hotel", b =>
                 {
+                    b.Navigation("HotelImages");
+
                     b.Navigation("HotelReviews");
 
                     b.Navigation("RoomBookings");

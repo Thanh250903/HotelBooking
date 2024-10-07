@@ -8,7 +8,6 @@ namespace HotelApp.Data
     public class ApplicationDBContext : DbContext
     {
         public DbSet<Hotel> Hotels { get; set; }
-        public DbSet<HotelImage> HotelImages { get; set; }
         public DbSet<HotelReview> HotelReviews { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomBooking> RoomBookings { get; set; }
