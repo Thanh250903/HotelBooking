@@ -2,6 +2,7 @@
 using HotelApp.Models.Hotel;
 using HotelApp.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 namespace HotelApp.Controllers
 {
@@ -11,11 +12,13 @@ namespace HotelApp.Controllers
 
         private ApplicationDBContext _dbContext;
         private readonly IUnitOfWork _unitOfWork;
-        public HotelController(IHotelRepository hotelRepository, ApplicationDBContext dbContext, IUnitOfWork unitOfWork)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public HotelController(IHotelRepository hotelRepository, ApplicationDBContext dbContext, IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
             HotelRepository = hotelRepository;
             _dbContext = dbContext;
             _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
         [Route("Index")]
         public IActionResult Index()
@@ -38,10 +41,38 @@ namespace HotelApp.Controllers
         [Route("Create")]
         [HttpPost]
 
-        public IActionResult CreateHotel(Hotel hotel)
+        public async Task<IActionResult> CreateHotel(Hotel hotel, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
+                // Upload image
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    // Image path
+                    var wwwRootPath = Path.Combine(_webHostEnvironment.WebRootPath, "img");
+                    var fileName = Path.GetFileName(imageFile.FileName);
+                    var filePath = Path.Combine(wwwRootPath, fileName);
+
+                    if (!Directory.Exists(wwwRootPath))
+                    {
+                        Directory.CreateDirectory(wwwRootPath);
+                    }
+                    //string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    //string hotelPath = Path.Combine(wwwRootPath + "images/hotels", fileName);
+
+                    // Save image to path 
+                    //using (var fileStream = new FileStream(hotelPath, FileMode.Create))
+                    //{
+                    //    await imageFile.CopyToAsync(fileStream);
+                    //}
+                    //hotel.ImageUrl = "/images/hotels/" + fileName;
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(fileStream);
+                    }
+                    hotel.ImageUrl = $"/img/" + fileName;
+
+                }  
                 _unitOfWork.HotelRepository.Add(hotel);
                 _unitOfWork.Save();
                 TempData["CreateHotel"] = "Hotel created successfully";
