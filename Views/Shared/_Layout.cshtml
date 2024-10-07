@@ -100,8 +100,41 @@
                 </nav>
 
     </div>
-        
             <div class="container-fluid">
+                <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <!-- Carousel indicators -->
+                    <ol class="carousel-indicators">
+                        <li data-bs-target="#myCarousel" data-bs-slide-to="0" class="active"></li>
+                        <li data-bs-target="#myCarousel" data-bs-slide-to="1"></li>
+                        <li data-bs-target="#myCarousel" data-bs-slide-to="2"></li>
+                        <li data-bs-target="#myCarousel" data-bs-slide-to="3"></li>
+                        <li data-bs-target="#myCarousel" data-bs-slide-to="4"></li>
+                    </ol>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="~/img/hotel1.jpg" class="d-block w-100" alt="Slide 1" style="width:auto; height: 350px; border-radius:15px" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/img/hotel2.jpg" class="d-block w-100" alt="Slide 2" style="width:auto; height: 350px; border-radius:15px" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/img/hotel3.jpg" class="d-block w-100" alt="Slide 3" style="width:auto; height: 350px; border-radius:15px" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/img/hotel4.jpg" class="d-block w-100" alt="Slide 4" style="width:auto; height: 350px; border-radius:15px" />
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/img/hotel5.jpg" class="d-block w-100" alt="Slide 5" style="width:auto; height: 350px; border-radius:15px" />
+                        </div>
+                    </div>
+                    <!-- Carousel controls -->
+                    <a class="carousel-control-prev" href="#myCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+                    <a class="carousel-control-next" href="#myCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+                </div>
                 @* <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelApp</a> *@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -110,17 +143,43 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 </div>
             </div>
-        
     </div>
+      
     
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
+    <!--Footter-->
+        <div class="container pb-10">
+            <div class="row g-5">
+                <div class="col-md-6 col-lg-4">
+                    <h6>Contact</h6>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt me-3"></i> 658 Ngo Quyen, Da Nang, Viet Nam </p>
+                    <p class="mb-2"><i class="fa fa-phone-alt me-3"></i>+84 968734627  </p>
+                    <p class="mb-2"><i class="fa fa-envelope me-3"></i>vutienthanh250903@gmail.com </p>
+                    <div class="d-flex">
+                        <a class="me-3" href="https://www.facebook.com/vutienthanh2509"><i class="fab fa-facebook-f text-secondary"></i></a>
+                        <a class="me-3" href="https://x.com/tienthanhh_vu"><i class="fab fa-twitter text-secondary"></i></a>
+                        <a class="me-3" href="https://www.linkedin.com/in/vu-tien-thanh-fgw-dn-52b171307/"><i class="fab fa-linkedin-in text-secondary"></i></a>
+                        <a class="me-3" href="https://www.instagram.com/covac.stork/"><i class="fab fa-instagram text-secondary"></i></a>
+                        <a class="" href="https://github.com/Thanh250903"><i class="fab fa-github text-secondary"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="border-top footer bg-dark text-muted" style="margin-top: auto" >
+            <div class="container text-center text-light text-uppercase">
+                © 2024 - Booking.com <i class="bi bi-house"></i>
+            </div>
+        </footer>
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
+
+   
+
 
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
