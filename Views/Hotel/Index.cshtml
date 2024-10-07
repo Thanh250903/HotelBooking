@@ -20,6 +20,7 @@
                 <th>Average Rating</th>
                 <th>Latitude</th>
                 <th>Longitude</th>
+                <th>Image</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -34,6 +35,12 @@
                     <td>@hotel.AverangeRating</td>
                     <td>@hotel.Lattitube</td>
                     <td>@hotel.Longitude</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(hotel.ImageUrl))
+                        {
+                            <img src="@hotel.ImageUrl" alt="Hotel Image" style="width: 100px; height: auto;" />
+                        }
+                    </td>
                     <td>
                         <a asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary btn-sm">
                             <i class="fas fa-edit"></i> Edit

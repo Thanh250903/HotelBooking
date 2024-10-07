@@ -4,7 +4,7 @@
     <h1>@TempData["success"]</h1>
 }
 <h1 class="text-center my-4">Create a Hotel</h1>
-<form method="post" class="container">
+<form method="post" enctype="multipart/form-data" class="container">
     <div class="border p-4 rounded shadow-sm">
         <div class="mb-3 row">
             <label asp-for="HotelName" class="col-sm-2 col-form-label"></label>
@@ -48,6 +48,22 @@
                 <input asp-for="Longitude" class="form-control" />
             </div>
         </div>
+@*         <div class="mb-3 row">
+            <label asp-for="ImageUrl" class="col-sm-2 col-form-label">Upload Image</label>
+            <div class="col-sm-10">
+                <input asp-for="ImageUrl" class="form-control" type="file" />
+            </div>
+        </div> *@
+        <div class="mb-3 row">
+            <label asp-for="ImageUrl" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input type="file" name="imageFile" class="form-control" />
+            </div>
+        </div>
+
+        </div>
+
+
         <div class="text-center row">
             <div class="col">
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
@@ -60,6 +76,7 @@
             </div>
     </div>
 </form>
+
 
 @section Scripts {
     @{
