@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using HotelApp.Models.Hotel;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace HotelApp.Models.ViewModel
 {
