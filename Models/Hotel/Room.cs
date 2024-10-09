@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static HotelApp.Models.Room.RoomBooking;
+using static HotelApp.Models.Hotel.RoomBooking;
 
-namespace HotelApp.Models.Room
+namespace HotelApp.Models.Hotel
 {
     // đại diện cho thông tin phòng của khách sạn
     public class Room
