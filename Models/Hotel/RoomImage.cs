@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Drawing;
 using System.Security.Policy;
 
-namespace HotelApp.Models.Room
+namespace HotelApp.Models.Hotel
 {
     // đại diện cho hình ảnh của phòng  
     public class RoomImage

@@ -1,7 +1,6 @@
 ﻿
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Others;
-using HotelApp.Models.Room;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelApp.Data

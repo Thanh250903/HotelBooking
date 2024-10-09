@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelApp.Models.Room
+namespace HotelApp.Models.Hotel
 {
     // đại diện cho thông tin đặt phòng của khách sạn
     public class RoomBooking
