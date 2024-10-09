@@ -1,0 +1,31 @@
+﻿@model HotelApp.Models.ViewModel.RoomVM
+<h1>@Model.HotelName - Rooms</h1>
+<a asp-controller="Room" asp-action="CreateRoom" asp-route="@Model.Id" class="btn-primary"> Create New Room </a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Room Number</th>
+            <th>Room Type</th>
+            <th>Price</th>
+            <th>Status Room </th>
+            <th>Bed Count</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach( var room in Model.Rooms)
+        {
+            <tr>
+                <td>@room.RoomNumber</td>
+                <td>@room.RoomType</td>
+                <td>@room.Price.ToString("C")</td>
+                <td>@room.StatusRooms</td>
+                <td>@room.BedCount</td>
+                <td>
+                    <a asp-controller="Room" asp-action="EditRoom" asp-route="@room.RoomId" class="btn-primary btn-warning" >Edit</a>
+                    <a asp-controller="Room" asp-action="DeleteRoom" asp-route="@room.RoomId" class="btn-primary btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using static HotelApp.Models.Hotel.RoomBooking;
+using static HotelApp.Models.Room.RoomBooking;
 
-namespace HotelApp.Models.Hotel
-{ 
+namespace HotelApp.Models.Room
+{
     // đại diện cho thông tin phòng của khách sạn
     public class Room
     {
@@ -31,7 +31,7 @@ namespace HotelApp.Models.Hotel
         public StatusRoom StatusRooms { get; set; }
         [Required]
         public int BedCount { get; set; } // Số lượng giường
-        public ICollection<RoomImage> RoomImages { get; set; }// ảnh phòng
-        public ICollection<RoomBooking> RoomBookings { get; set; } // Cách đặt phòng của phòng này
+        public ICollection<RoomImage>? RoomImages { get; set; }// ảnh phòng
+        public ICollection<RoomBooking>? RoomBookings { get; set; } // Cách đặt phòng của phòng này
     }
 }
