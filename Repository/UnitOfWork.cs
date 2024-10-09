@@ -7,6 +7,7 @@ namespace HotelApp.Repository
     {
        private readonly ApplicationDBContext _dbContext;
        public IHotelRepository HotelRepository { get; set; }
+       public IRoomRepository RoomRepository { get; set; }
 
        public UnitOfWork(ApplicationDBContext dbContext)
         {
