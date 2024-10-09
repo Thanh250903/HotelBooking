@@ -2,6 +2,7 @@
 using HotelApp.Models.Hotel;
 using HotelApp.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing;
 
 namespace HotelApp.Controllers
@@ -27,9 +28,15 @@ namespace HotelApp.Controllers
             return View(hotels);
         }
         [Route("Details")]
-        public IActionResult Details()
+        public IActionResult Details(int id)
         {
-            return View();
+            var hotel = _unitOfWork.HotelRepository.GetById(id);
+            if (hotel == null)
+            {
+                return NotFound();
+            }
+
+            return View(hotel);
         }
 
         [Route("Create")]
@@ -57,15 +64,6 @@ namespace HotelApp.Controllers
                     {
                         Directory.CreateDirectory(wwwRootPath);
                     }
-                    //string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-                    //string hotelPath = Path.Combine(wwwRootPath + "images/hotels", fileName);
-
-                    // Save image to path 
-                    //using (var fileStream = new FileStream(hotelPath, FileMode.Create))
-                    //{
-                    //    await imageFile.CopyToAsync(fileStream);
-                    //}
-                    //hotel.ImageUrl = "/images/hotels/" + fileName;
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
                         await imageFile.CopyToAsync(fileStream);
@@ -75,7 +73,7 @@ namespace HotelApp.Controllers
                 }  
                 _unitOfWork.HotelRepository.Add(hotel);
                 _unitOfWork.Save();
-                TempData["CreateHotel"] = "Hotel created successfully";
+                TempData["success"] = "Hotel created successfully";
                 TempData["ShowMessage"] = true;
                 return RedirectToAction("Index");
             }
@@ -99,19 +97,33 @@ namespace HotelApp.Controllers
         [Route("Edit/id")]
         [HttpPost]
 
-        public IActionResult EditHotel(Hotel hotel)
+        public IActionResult EditHotel(Hotel hotel, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
             {
+                if (imageFile != null && imageFile.Length >0)
+                {
+                    string wwwRootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    string imagePath = Path.Combine(wwwRootPath, "img");
+
+                    using (var fileStream = new FileStream(Path.Combine(imagePath, fileName), FileMode.Create))
+                    {
+                        imageFile.CopyTo(fileStream);
+                    }
+                    hotel.ImageUrl = "/img/" + fileName;
+
+                    //checking img value
+                    //Console.WriteLine("Image Url" + hotel.ImageUrl);
+                }
                 _unitOfWork.HotelRepository.Update(hotel);
                 _unitOfWork.Save();
                 TempData["success"] = "Hotel Updated successfully";
                 return RedirectToAction("Index");
             }
-            return View();
+            return View(hotel);
         }
         [Route("Delete/id")]
-
         public IActionResult DeleteHotel(int? id)
         {
             Hotel hotel = new Hotel();
@@ -133,7 +145,7 @@ namespace HotelApp.Controllers
         {
             _unitOfWork.HotelRepository.Delete(hotel);
             _unitOfWork.Save();
-            TempData["DeleteHotel"] = "Hotel deleted successfully";
+            TempData["success"] = "Hotel deleted successfully";
             TempData["ShowMessage"] = true;
             return RedirectToAction("Index");
         }

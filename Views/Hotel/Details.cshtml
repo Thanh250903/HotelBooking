@@ -1,0 +1,27 @@
+﻿@model HotelApp.Models.Hotel.Hotel
+
+<h2>Chi tiết Khách Sạn</h2>
+
+<div class="mb-3">
+    <h4>@Model.HotelName</h4>
+</div>
+
+<div class="mb-3">
+    <strong>Địa chỉ:</strong> @Model.City
+</div>
+
+<!-- Hiển thị ảnh của khách sạn -->
+@if (!string.IsNullOrEmpty(Model.ImageUrl))
+{
+    <div class="mb-3">
+        <strong>Hình ảnh:</strong><br />
+        <img src="@Model.ImageUrl" alt="Hình ảnh Khách Sạn" style="height: 300px; object-fit: cover;" />
+    </div>
+}
+
+<!-- Thêm các thông tin khác của khách sạn ở đây -->
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.HotelId" class="btn btn-primary">Đặt phòng</a>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+</div>
