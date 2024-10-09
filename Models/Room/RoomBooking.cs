@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HotelApp.Models.Hotel
+namespace HotelApp.Models.Room
 {
     // đại diện cho thông tin đặt phòng của khách sạn
     public class RoomBooking
@@ -29,7 +29,7 @@ namespace HotelApp.Models.Hotel
         [Required]
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         public decimal TotalPrice { get; set; }
-        public int? PaymentId {  get; set; } // Null nếu kh có thanh toán
+        public int? PaymentId { get; set; } // Null nếu kh có thanh toán
         [ForeignKey("PaymentId")]
         // Thêm navigation property từ RoomBooking đến Payment
         public Payment? Payment { get; set; } // Tham chiếu tới Payment nếu có thanh toán

@@ -6,6 +6,8 @@ namespace HotelApp.Repository.IRepository
 {
 	public interface IHotelRepository : IRepository<Hotel>
 	{
-		void Update(Hotel entity);
+        Hotel GetById(int id);
+        void Update(Hotel entity);
+
 	}
 }

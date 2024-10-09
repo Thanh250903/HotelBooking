@@ -1,5 +1,4 @@
-﻿
-using HotelApp.Models.Hotel;
+﻿using HotelApp.Models.Room;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
