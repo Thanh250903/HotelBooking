@@ -10,7 +10,7 @@ namespace HotelApp.Models.Others
         [Key]
         public int PaymentId { get; set; } // mã của thanh toán 
         [Required]
-        public int UserId { get; set; } // mã khách hàng
+        public string UserId { get; set; } // mã khách hàng
         [Required]
         [ForeignKey("UserId")] 
         public ApplicationUser User { get; set; } // liên kết với khóa ngoại để bt khách hàng nào
@@ -19,7 +19,7 @@ namespace HotelApp.Models.Others
         [ForeignKey("RoomId")]
         public RoomBooking? RoomBooking { get; set; } // liên kết với khóa ngoại để bt thuê phòng nào
         [Required]
-        public DateTime PaymentTime { get; set; } // thời gian thanh toán
+        public DateTime PaymentTime { get; set; } = DateTime.Now; // thời gian thanh toán
         [Required]
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         public decimal TotalPrice { get; set; } // tổng giá

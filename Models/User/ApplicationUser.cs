@@ -1,26 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace HotelApp.Models.Others
 {
-    public class ApplicationUser :IdentityUser<int>
+    public class ApplicationUser :IdentityUser
     {
-        public new int UserId { get; set; }
         [Required]
-        public string UserName { get; set; }
-        [Required]
-        public int UserPhoneNumber { get; set; }
-        [Required]
-        public string UserEmail { get; set; }
+        public string UserPhoneNumber { get; set; }
         [Required]
         public string UserAddress { get; set; }
-        [Required]
+        [ValidateNever]
         public bool UserGender { get; set; } // phân biệt giới tính khách hàng 0 là nam 1 là nữ
-        [Required]
-        public byte[] PasswordHash { get; set; }
-        [Required]
-        public byte[] PasswordSalt { get; set; }
-        [Required]
-        public DateTime DateCreate { get; set; }
+        [ValidateNever]
+        public string Role { get;set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public bool IsActive { get; set; } = true; // Active status
     }
 }

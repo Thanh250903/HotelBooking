@@ -16,7 +16,7 @@ namespace HotelApp.Models.Hotel
         [ForeignKey("RoomId")]
         public Room Room { get; set; } // liên kết với đối tượng Room, xem phòng nào đã được đặt
         [Required]
-        public int UserId { get; set; } // mã định danh của người đặt phòng
+        public string UserId { get; set; } // mã định danh của người đặt phòng
         [Required]
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; } // liên kết với đối tượng User, xem người nào đã đặt phòng
