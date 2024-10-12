@@ -107,6 +107,9 @@ namespace HotelApp.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("RoomImgUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
@@ -164,28 +167,6 @@ namespace HotelApp.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RoomBookings");
-                });
-
-            modelBuilder.Entity("HotelApp.Models.Hotel.RoomImage", b =>
-                {
-                    b.Property<int>("RoomImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomImageId"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RoomImageId");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("RoomImages");
                 });
 
             modelBuilder.Entity("HotelApp.Models.Others.ApplicationUser", b =>
@@ -359,17 +340,6 @@ namespace HotelApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HotelApp.Models.Hotel.RoomImage", b =>
-                {
-                    b.HasOne("HotelApp.Models.Hotel.Room", "Room")
-                        .WithMany("RoomImages")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
-                });
-
             modelBuilder.Entity("HotelApp.Models.Others.Payment", b =>
                 {
                     b.HasOne("HotelApp.Models.Hotel.RoomBooking", "RoomBooking")
@@ -399,8 +369,6 @@ namespace HotelApp.Migrations
             modelBuilder.Entity("HotelApp.Models.Hotel.Room", b =>
                 {
                     b.Navigation("RoomBookings");
-
-                    b.Navigation("RoomImages");
                 });
 #pragma warning restore 612, 618
         }
