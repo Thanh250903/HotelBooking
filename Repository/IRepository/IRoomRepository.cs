@@ -10,5 +10,6 @@ namespace HotelApp.Repository.IRepository
         Room GetById(int id);
         IEnumerable<Room> GetRoomsByHotelId(int hotelId);
         IEnumerable<Room> GetAll(Expression<Func<Room, bool>> filter = null);
+        bool IsRoomNumberUnique(int hotelId, int roomNumber);
     }
 }

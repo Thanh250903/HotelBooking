@@ -40,6 +40,11 @@ namespace HotelApp.Repository
 
             return query.ToList();
         }
+        
+        public bool IsRoomNumberUnique(int hotelId, int roomNumber)
+        {
+            return !_dbContext.Rooms.Any(r => r.HotelId == hotelId && r.RoomNumber == roomNumber);
+        }
 
     }
 }
