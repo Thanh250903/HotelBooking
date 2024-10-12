@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using HotelApp.Models.Hotel;
+using System.Linq.Expressions;
 
 namespace HotelApp.Repository.IRepository
 {
@@ -8,5 +9,6 @@ namespace HotelApp.Repository.IRepository
         T Get(Expression<Func<T, bool>> filter, string? includeProperty = null);
         void Add(T entity);
         void Delete(T entity);
+        Hotel GetFirstOrDefault(Expression<Func<Hotel, bool>> filter, string? includeProperties = null);
     }
 }
