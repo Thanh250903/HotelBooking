@@ -11,7 +11,6 @@ namespace HotelApp.Data
         public DbSet<HotelReview> HotelReviews { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomBooking> RoomBookings { get; set; }
-        public DbSet<RoomImage> RoomImages { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<ApplicationUser> User { get; set; }
 

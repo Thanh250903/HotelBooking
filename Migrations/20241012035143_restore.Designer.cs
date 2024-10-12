@@ -4,6 +4,7 @@ using HotelApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HotelApp.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241012035143_restore")]
+    partial class restore
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,9 +110,6 @@ namespace HotelApp.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("RoomImgUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int");
 
@@ -167,6 +167,28 @@ namespace HotelApp.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RoomBookings");
+                });
+
+            modelBuilder.Entity("HotelApp.Models.Hotel.RoomImage", b =>
+                {
+                    b.Property<int>("RoomImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RoomImageId"));
+
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoomImageId");
+
+                    b.HasIndex("RoomId");
+
+                    b.ToTable("RoomImage");
                 });
 
             modelBuilder.Entity("HotelApp.Models.Others.ApplicationUser", b =>
@@ -340,6 +362,17 @@ namespace HotelApp.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HotelApp.Models.Hotel.RoomImage", b =>
+                {
+                    b.HasOne("HotelApp.Models.Hotel.Room", "Room")
+                        .WithMany("RoomImages")
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("HotelApp.Models.Others.Payment", b =>
                 {
                     b.HasOne("HotelApp.Models.Hotel.RoomBooking", "RoomBooking")
@@ -369,6 +402,8 @@ namespace HotelApp.Migrations
             modelBuilder.Entity("HotelApp.Models.Hotel.Room", b =>
                 {
                     b.Navigation("RoomBookings");
+
+                    b.Navigation("RoomImages");
                 });
 #pragma warning restore 612, 618
         }
