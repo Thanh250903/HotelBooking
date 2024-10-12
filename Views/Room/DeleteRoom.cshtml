@@ -3,8 +3,59 @@
 {
     <h1>@TempData["success"]</h1>
 }
+<h1 class="text-center">Edit Hotel</h1>
+<form method="post" class="container">
+    <input type="hidden" asp-for="HotelId" />
+    <input type="hidden" asp-for="RoomId" />
+    <div class="border p-4 rounded shadow-sm">
+        <div class="mb-3 row">
+            <label asp-for="RoomNumber" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="RoomNumber" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="RoomType" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="RoomType" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="Price" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="Price" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="StatusRoom" class="col-sm-2 col-form-label" ></label>
+            <div class="col-sm-10">
+                <select asp-for="StatusRoom" class="form-control" disabled>
+                    <option value="Available">Available</option>
+                    <option value="Occupied">Occupied</option>
+                    <option value=" Maintenance"> Maintenance</option>
+                </select>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="BedCount" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="BedCount" class="form-control" disabled />
+            </div>
+        </div>
+    </div>
 
-
+    <div class="text-center row">
+        <div class="col">
+            <button type="submit" class="btn btn-danger w-100">Delete</button>
+        </div>
+        <div class="col">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-dark w-100">Quay lại</a>
+        </div>
+        <div class="col">
+            <button type="reset" class="btn btn-primary w-100">Reset all</button>
+        </div>
+    </div>
+</form>
 
 
 @section Scripts {

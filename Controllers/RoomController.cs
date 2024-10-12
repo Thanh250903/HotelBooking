@@ -3,6 +3,7 @@ using HotelApp.Models.Hotel;
 using HotelApp.Models.Hotel.VM;
 using HotelApp.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace HotelApp.Controllers
 {
@@ -93,6 +94,13 @@ namespace HotelApp.Controllers
                     return View(roomVM);
                 }
 
+                //Check roomnumber same name
+                if(!_unitOfWork.RoomRepository.IsRoomNumberUnique(roomVM.HotelId, roomVM.RoomNumber))
+                {
+                    ModelState.AddModelError("", "Room number already exits for this hotel, try again!!!");
+                    return View(roomVM);
+                }
+
                 //Add room into hotel method
                 _unitOfWork.RoomRepository.Add(room);
                 _unitOfWork.Save();
@@ -114,7 +122,6 @@ namespace HotelApp.Controllers
         }
 
         [HttpGet]
-        [Route("Edit/id")]
         public IActionResult EditRoom(int id)
         {
             var room = _unitOfWork.RoomRepository.GetById(id);
@@ -122,9 +129,9 @@ namespace HotelApp.Controllers
             {
                 return NotFound();
             }
-
             RoomVM roomVM = new RoomVM
             {
+                HotelId = room.HotelId,
                 RoomId = room.RoomId,
                 RoomNumber = room.RoomNumber,
                 RoomType = room.RoomType,
@@ -137,26 +144,63 @@ namespace HotelApp.Controllers
         }
 
         [HttpPost]
-        [Route("Edit/id")]
-        public IActionResult EditRoom(RoomVM roomVM)
+       
+        public async Task<IActionResult> EditRoom(RoomVM roomVM, IFormFile? roomImages)
         {
             if (ModelState.IsValid)
             {
-                Room room = new Room
+                // Handle image update
+                if(roomImages != null && roomImages.Length > 0)
                 {
-                    RoomId = roomVM.RoomId,
-                    RoomNumber = roomVM.RoomNumber,
-                    RoomType = roomVM.RoomType,
-                    Price = roomVM.Price,
-                    StatusRooms = roomVM.StatusRoom,
-                    BedCount = roomVM.BedCount,
-                    RoomImgUrl = roomVM.RoomImgUrl,
-                };
+                    var wwwRootPath = Path.Combine(_webHostEnvironment.WebRootPath, "img");
+                    var fileName = Path.GetFileName(roomImages.FileName);
+                    var filePath = Path.Combine(wwwRootPath, fileName);
+
+                    try
+                    {
+                        if (!Directory.Exists(wwwRootPath))
+                        {
+                            Directory.CreateDirectory(wwwRootPath);
+                        }
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await roomImages.CopyToAsync(fileStream);
+                        }
+                        roomVM.RoomImgUrl = $"/img/" + fileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", "Image upload error: " + ex.Message);
+                        return View(roomVM);
+                    }
+
+                }
+                
+                var room = _unitOfWork.RoomRepository.GetById(roomVM.RoomId);
+                if(room == null)
+                {
+                    ModelState.AddModelError("", "Room not found");
+                    return View(roomVM);
+                }
+                //room.RoomId = roomVM.RoomId;
+                room.RoomNumber = roomVM.RoomNumber;
+                room.RoomType = roomVM.RoomType;
+                room.Price = roomVM.Price;
+                room.StatusRooms = roomVM.StatusRoom;
+                room.BedCount = roomVM.BedCount;
+                room.RoomImgUrl = roomVM.RoomImgUrl;
+
+                if (!_unitOfWork.RoomRepository.IsRoomNumberUnique(roomVM.HotelId, roomVM.RoomNumber))
+                {
+                    ModelState.AddModelError("", "Room number already exists for this hotel.");
+                    return View(roomVM);
+                }
+
                 _unitOfWork.RoomRepository.Update(room);
                 _unitOfWork.Save();
                 TempData["success"] = "Edit room successfully";
                 TempData["ShowMessage"] = true;
-                return RedirectToAction("Index", new
+                return RedirectToAction("Details", "Hotel", new
                 {
                     id = roomVM.HotelId
                 });
@@ -164,38 +208,54 @@ namespace HotelApp.Controllers
             return View(roomVM);
         }
 
-        [HttpGet]
-        [Route("Delete/id")]
+        [HttpGet, HttpPost]
         public IActionResult DeleteRoom(int id)
         {
-            Room room = new Room();
-            room = _unitOfWork.RoomRepository.GetById(id);
+            var room = _unitOfWork.RoomRepository.GetById(id);
             if (room == null)
             {
-                return NotFound();
+                TempData["error"] = "Room not found. Deletion failed.";
+                return RedirectToAction("Index", "Hotel");
             }
-            return View(room);
-        }
 
-        [HttpPost]
-        [Route("Delete/id")]
-        public IActionResult DeleteRoom(int id, Room room)
-        {
-            if (ModelState.IsValid)
+            if (Request.Method == "GET")
             {
-                room = _unitOfWork.RoomRepository.GetById(id);
-                if (room != null)
+                RoomVM roomVM = new RoomVM
                 {
+                    RoomId = room.RoomId,
+                    HotelId = room.HotelId,
+                    RoomNumber = room.RoomNumber,
+                    RoomType = room.RoomType,
+                    Price = room.Price,
+                    StatusRoom = room.StatusRooms,
+                    BedCount = room.BedCount,
+                    RoomImgUrl = room.RoomImgUrl,
+                };
+                return View(roomVM);
+            }
+            else if (Request.Method == "POST")
+            {
+                try
+                {
+                    int hotelId = room.HotelId; // Lấy HotelId trước khi xóa
+
                     _unitOfWork.RoomRepository.Delete(room);
                     _unitOfWork.Save();
-                    TempData["success"] = "Delete room successfully";
-                    TempData["ShowMessage"] = true;
+
+                    TempData["success"] = "Room deleted successfully";
+                    return RedirectToAction("Details", "Hotel", new { id = hotelId });
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    Console.WriteLine("Error deleting room: " + ex.Message);
+                    TempData["error"] = "An error occurred while trying to delete the room. Please try again.";
+                    return RedirectToAction("Details", "Hotel", new { id = room.HotelId });
                 }
             }
-            return RedirectToAction("Index", new
-            {
-                id = room.HotelId
-            });
+
+            TempData["error"] = "Invalid request method.";
+            return RedirectToAction("Index", "Hotel");
         }
     }
 }
