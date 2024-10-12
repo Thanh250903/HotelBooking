@@ -13,6 +13,7 @@ namespace HotelApp.Repository
         {
             _dbContext = dbContext;
             HotelRepository = new HotelRepository(dbContext);
+            RoomRepository = new RoomRepository(dbContext);
         }
         public void Save()
         {

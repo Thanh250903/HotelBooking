@@ -1,5 +1,19 @@
 ﻿@model List<HotelApp.Models.Hotel.Hotel>
-<partial name="_Notification" />
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+
 <div class="row pt-4 pb-4">
     <div class="col-6">
         <h2 style="text-transform:uppercase"> List of Hotels</h2>
@@ -51,6 +65,9 @@
                         </a>
                         <a asp-controller="Hotel" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger btn-sm">
                             <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                        <a asp-controller="Room" asp-action="CreateRoom" asp-route-id="@hotel.HotelId" class="btn btn-success btn-sm">
+                            <i class="fas fa-add"></i> Add Room
                         </a>
                     </td>
                 </tr>

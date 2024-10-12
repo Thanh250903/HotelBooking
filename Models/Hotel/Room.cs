@@ -31,7 +31,8 @@ namespace HotelApp.Models.Hotel
         public StatusRoom StatusRooms { get; set; }
         [Required]
         public int BedCount { get; set; } // Số lượng giường
-        public ICollection<RoomImage>? RoomImages { get; set; }// ảnh phòng
+
+        public string? RoomImgUrl { get; set; } 
         public ICollection<RoomBooking>? RoomBookings { get; set; } // Cách đặt phòng của phòng này
     }
 }
