@@ -1,5 +1,8 @@
 ﻿@model HotelApp.Models.Hotel.Hotel
-
+@if (TempData["success"] != null)
+{
+    <h1>@TempData["success"]</h1>
+}
 <h1 class="text-center my-4">Delete a Hotel</h1>
 <form method="post" class="container">
     <input type="hidden" asp-for="HotelId" />
