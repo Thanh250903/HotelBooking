@@ -20,7 +20,7 @@ namespace HotelApp.Models.Hotel
         [ValidateNever]
         [StringLength(100)]
         public string Comment { get; set; } // bình luận của người dùng
-        [ValidateNever]
+       
         //public string UserName { get; set; } // tên người bình luận
     }
 }
