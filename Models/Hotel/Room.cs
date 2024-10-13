@@ -10,16 +10,16 @@ namespace HotelApp.Models.Hotel
     {
         [Key]
         public int RoomId { get; set; } // mã phòng
-        [Required]
-        public int HotelId { get; set; } // mã định danh của khách sạn mà phòng thuộc về
-        [Required]
+        [ValidateNever]
+        public int? HotelId { get; set; } // mã định danh của khách sạn mà phòng thuộc về
+        [ValidateNever]
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; } // liên kết với Hotel để phòng này thuộc Hotel nào
-        [Required]
+        [Required(ErrorMessage = "Room number cannot be empty")]
         public int RoomNumber { get; set; } // tên phòng, vd phòng 101, 102, 103, ...
-        [Required]
+        [ValidateNever]
         public string RoomType { get; set; } // dạng phòng, vd double, family, single, suite
-        [Required]
+        [ValidateNever]
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         public decimal Price { get; set; } // giá tiền của phòng
         public enum StatusRoom
@@ -29,9 +29,9 @@ namespace HotelApp.Models.Hotel
             Maintenance
         } // Ví dụ: "Available", "Occupied", "Maintenance"
         public StatusRoom StatusRooms { get; set; }
-        [Required]
+        [ValidateNever]
         public int BedCount { get; set; } // Số lượng giường
-
+        [ValidateNever]
         public string? RoomImgUrl { get; set; } 
         public ICollection<RoomBooking>? RoomBookings { get; set; } // Cách đặt phòng của phòng này
     }
