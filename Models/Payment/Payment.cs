@@ -9,18 +9,19 @@ namespace HotelApp.Models.Others
     {
         [Key]
         public int PaymentId { get; set; } // mã của thanh toán 
-        [Required]
-        public string UserId { get; set; } // mã khách hàng
-        [Required]
-        [ForeignKey("UserId")] 
-        public ApplicationUser User { get; set; } // liên kết với khóa ngoại để bt khách hàng nào
-        [Required]
+        [ValidateNever]
+        //public string UserId { get; set; } // mã khách hàng
+        //[Required]
+        //[ForeignKey("UserId")] 
+        //public ApplicationUser User { get; set; } // liên kết với khóa ngoại để bt khách hàng nào
+        //[Required]
         public int? RoomBookingId { get; set; } // mã thuê phòng
-        [ForeignKey("RoomId")]
+        [ForeignKey("RoomBoookingId")]
+        [ValidateNever]
         public RoomBooking? RoomBooking { get; set; } // liên kết với khóa ngoại để bt thuê phòng nào
-        [Required]
+        [ValidateNever]
         public DateTime PaymentTime { get; set; } = DateTime.Now; // thời gian thanh toán
-        [Required]
+        [ValidateNever]
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         public decimal TotalPrice { get; set; } // tổng giá
         public enum PaymenMethod
@@ -40,7 +41,7 @@ namespace HotelApp.Models.Others
         {
             Room
         }
-        [Required]
+        [ValidateNever]
         public BookingType Status { get; set; }
     }
 }

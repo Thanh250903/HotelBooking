@@ -6,15 +6,17 @@ namespace HotelApp.Models.Others
 {
     public class ApplicationUser :IdentityUser
     {
-        [Required]
+        [ValidateNever]
         public string UserPhoneNumber { get; set; }
-        [Required]
+        [ValidateNever]
         public string UserAddress { get; set; }
         [ValidateNever]
         public bool UserGender { get; set; } // phân biệt giới tính khách hàng 0 là nam 1 là nữ
         [ValidateNever]
         public string Role { get;set; }
+        [ValidateNever]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [ValidateNever]
         public bool IsActive { get; set; } = true; // Active status
     }
 }

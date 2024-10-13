@@ -9,14 +9,14 @@ namespace HotelApp.Models.Hotel
     {       
         [Key]
         public int HotelId { get; set; } // mã khách sạn
-        [Required]
+        [Required(ErrorMessage = "Hotel name can not be empty")]
         [StringLength(50)]
         public string HotelName { get; set; } // tên ksan
-        [Required]
+        [ValidateNever]
         public string Description { get; set; } // mô tả ksan
-        [Required]
+        [ValidateNever]
         public string City { get; set; } // ksan đó nằm ở vị trí nào
-        [Required]
+        [ValidateNever]
         public int NumberPhone { get; set; } // sđt của khách sạn
         [NotMapped] // kh lưu được ở trong CSDL và khi thêm khách sạn sẽ kh hiện trường này lên, nó sẽ lấy dữ liệu từ HotelReview
         public double AverangeRating 
@@ -30,8 +30,8 @@ namespace HotelApp.Models.Hotel
                 return 0; // Giá trị mặc định khi không có đánh giá nào
             }
         } // trường này đùng để tính toán số lượng Review đánh giá về khách sạn, không lưu trữ trong Database.
-        public double Lattitube { get; set; } // kinh độ
-        [Required]
+        public double Latitude { get; set; } // kinh độ
+        [ValidateNever]
         public double Longitude { get; set; } // vĩ độ
         [ValidateNever]
         public string? ImageUrl {  get; set; } // đường dẫn ảnh
