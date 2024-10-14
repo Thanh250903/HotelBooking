@@ -30,7 +30,7 @@ namespace HotelApp.Models.Hotel
                 return 0; // Giá trị mặc định khi không có đánh giá nào
             }
         } // trường này đùng để tính toán số lượng Review đánh giá về khách sạn, không lưu trữ trong Database.
-        public double Latitude { get; set; } // kinh độ
+        public double Lattitube { get; set; } // kinh độ
         [ValidateNever]
         public double Longitude { get; set; } // vĩ độ
         [ValidateNever]

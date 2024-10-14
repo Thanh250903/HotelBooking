@@ -11,7 +11,7 @@ namespace HotelApp.Models.Hotel
         [Key]
         public int RoomId { get; set; } // mã phòng
         [ValidateNever]
-        public int? HotelId { get; set; } // mã định danh của khách sạn mà phòng thuộc về
+        public int HotelId { get; set; } // mã định danh của khách sạn mà phòng thuộc về
         [ValidateNever]
         [ForeignKey("HotelId")]
         public Hotel Hotel { get; set; } // liên kết với Hotel để phòng này thuộc Hotel nào

@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Identity
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - YourApplicationName</title>
+    <link rel="stylesheet" href="~/css/_LoginPartial.cshtml.css" />
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="~/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="~/css/style.css" rel="stylesheet">
+</head>
+
+<ul class="navbar-nav ms-auto">
+    <!-- Thêm class ms-auto để đẩy nút về bên phải -->
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+        </li>
+        <li class="nav-item">
+            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <div class="nav-right">
+        <li class="nav-item">
+            <a class="nav-link" id="register"
+               style="font-size: 15px; margin-left:840px; text-transform: uppercase; background-color: white; color: black; padding: 10px 15px; border-radius: 5px;"
+               onmouseover="this.style.backgroundColor='#0056b3'; this.style.color='white';"
+               onmouseout="this.style.backgroundColor='white'; this.style.color='black';"
+               asp-area="Identity" asp-page="/Account/Register">Register</a>  <br />
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="login"
+               style="font-size: 15px; margin-left:840px; text-transform: uppercase; background-color: white; color: black; padding: 10px 15px; border-radius: 5px;"
+               onmouseover="this.style.backgroundColor='#0056b3'; this.style.color='white';"
+               onmouseout="this.style.backgroundColor='white'; this.style.color='black';"
+               asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+        </div>
+    }
+</ul>
+
