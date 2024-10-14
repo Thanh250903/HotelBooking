@@ -9,7 +9,7 @@ namespace HotelApp.Models.Hotel
     public class Room
     {
         [Key]
-        public int RoomId { get; set; } // mã phòng
+        public int RoomId { get; set; } // mã phòng kh sạn
         [ValidateNever]
         public int HotelId { get; set; } // mã định danh của khách sạn mà phòng thuộc về
         [ValidateNever]
