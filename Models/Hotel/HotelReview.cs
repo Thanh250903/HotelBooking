@@ -8,7 +8,7 @@ namespace HotelApp.Models.Hotel
     {
         // đại diện đánh giá cho khách hàng về khách sạn
         [Key]
-        public int ReviewId { get; set; } // mã định danh của Review khách sạn
+        public int ReviewId { get; set; } // mã định danh của Review khách sạn, ai review
         [ValidateNever]
         public int? HotelId { get; set; } // mã định danh của ksan, để biết Review này thuộc ksan nào
         [ValidateNever]
@@ -20,7 +20,7 @@ namespace HotelApp.Models.Hotel
         [ValidateNever]
         [StringLength(100)]
         public string Comment { get; set; } // bình luận của người dùng
-        [ValidateNever]
+       
         //public string UserName { get; set; } // tên người bình luận
     }
 }
