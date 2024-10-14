@@ -10,9 +10,9 @@ namespace HotelApp.Models.Others
         [ValidateNever]
         public string UserAddress { get; set; }
         [ValidateNever]
-        public bool UserGender { get; set; } // phân biệt giới tính khách hàng 0 là nam 1 là nữ
+        public bool UserGender { get; set; } // phân biệt giới tính khách hàng 0 là nam 1 là nữ 
         [ValidateNever]
-        public string Role { get;set; }
+        public string Role { get;set; } // User, Admin, Owner
         [ValidateNever]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [ValidateNever]

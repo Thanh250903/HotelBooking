@@ -8,18 +8,18 @@ namespace HotelApp.Models.Others
     public class Payment // model này đại diện cho các phương thức thanh toán, ở đây chúng tôi chỉ thanh toán onlnie qua các hình thức như BankTransfer, CreditCard và Momo
     {
         [Key]
-        public int PaymentId { get; set; } // mã của thanh toán 
+        public int PaymentId { get; set; } // mã của thanh toán kh sạn
         [ValidateNever]
-        //public string UserId { get; set; } // mã khách hàng
-        //[Required]
-        //[ForeignKey("UserId")] 
-        //public ApplicationUser User { get; set; } // liên kết với khóa ngoại để bt khách hàng nào
-        //[Required]
-        public int? RoomBookingId { get; set; } // mã thuê phòng
-        [ForeignKey("RoomBoookingId")]
+        public string UserId { get; set; } // mã khách hàng
         [ValidateNever]
-        public RoomBooking? RoomBooking { get; set; } // liên kết với khóa ngoại để bt thuê phòng nào
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; } // liên kết với khóa ngoại để bt khách hàng nào
         [ValidateNever]
+        //public int RoomBookingId { get; set; } // mã thuê phòng
+        //[ForeignKey("RoomBookingId")]
+        //[ValidateNever]
+        //public RoomBooking RoomBooking { get; set; } // liên kết với khóa ngoại để bt thuê phòng nào
+        //[ValidateNever]
         public DateTime PaymentTime { get; set; } = DateTime.Now; // thời gian thanh toán
         [ValidateNever]
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
@@ -37,7 +37,7 @@ namespace HotelApp.Models.Others
             Failed
         }
         public PaymenMethod Method { get; set; }
-        public enum BookingType // đặt phòng hay là chuyến đi
+        public enum BookingType 
         {
             Room
         }
