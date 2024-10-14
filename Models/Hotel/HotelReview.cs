@@ -20,7 +20,14 @@ namespace HotelApp.Models.Hotel
         [ValidateNever]
         [StringLength(100)]
         public string Comment { get; set; } // bình luận của người dùng
+
        
+       
+=========
+>>>>>>>>> Temporary merge branch 2
+       
+=========
+>>>>>>>>> Temporary merge branch 2
         //public string UserName { get; set; } // tên người bình luận
     }
 }
