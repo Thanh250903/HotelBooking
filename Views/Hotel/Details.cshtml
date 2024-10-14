@@ -24,12 +24,41 @@
 @if (!string.IsNullOrEmpty(@ViewBag.Hotels.ImageUrl))
 {
     <div class="mb-3">
-        <strong>Hình ảnh:</strong><br />
-        <img src="@ViewBag.Hotels.ImageUrl" alt="Hình ảnh Khách Sạn" style="height: 300px; object-fit: cover;" />
+        <img src="@ViewBag.Hotels.ImageUrl" alt="Hình ảnh Khách Sạn"
+             style="height: 300px; object-fit: cover; cursor: zoom-in;"
+             onclick="openModal(this)" />
+        <a asp-area="" asp-controller="" asp-action="BookingRoom" asp-route-id="" class="btn btn-primary btn-pm" style="position: absolute; margin-left: 10px; cursor: pointer; z-index:10; ">Đặt ngay</a>
+
+        <!-- Lightbox Modal -->
+        <div id="imageModal" style="display:none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
+            <span style="position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeModal()">&times;</span>
+            <img id="modalImage" style="margin: auto; display: block; width: 100%; height: 100%; object-fit: contain;">
+        </div>
+
+        <script>
+            function openModal(img) {
+                // Zoom in
+                var modal = document.getElementById("imageModal");
+                var modalImg = document.getElementById("modalImage");
+                modal.style.display = "block";
+                modalImg.src = img.src;
+            }
+
+            function closeModal() {
+                // Zoom out
+                var modal = document.getElementById("imageModal");
+                modal.style.display = "none";
+            }
+        </script>
     </div>
 }
-<div>
-<div class="col-6 text-right">
+<div class="row pt-4 pb-4">
+    <div class="col-6">
+        <h2 style="text-transform:uppercase"> List of Room in @ViewBag.Hotels.HotelName</h2>
+    </div>
+</div>
+
+<div class="container">
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
             <tr>
@@ -39,6 +68,7 @@
                 <th>Status</th>
                 <th>Bed Count</th>
                 <th>Image</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -53,12 +83,12 @@
                     <td>
                         @if (!string.IsNullOrEmpty(room.RoomImgUrl))
                         {
-                            <img  src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover"/>
+                                <img src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover" />
                         }
                         else
                         {
                             <p>
-                                This image not available
+                               Image not availabe
                             </p>
                         }
                     </td>
@@ -67,10 +97,10 @@
                             <i class="fas fa-edit"></i> Edit
                         </a>
                         <a asp-controller="Room" asp-action="DeleteRoom" asp-route-id="@room.RoomId" class="btn btn-danger btn-sm">
-                            <i class="fas fa-edit"></i> Delete
+                             <i class="fas fa-trash-alt"></i> Delete
                         </a>
                         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
-                            <i class="fas fa-edit"></i> Return
+                                <i class="fas fa-undo"></i> Return
                         </a>
                     </td>
                 </tr>
@@ -78,5 +108,11 @@
         </tbody>
     </table>
 </div>
-</div>
 
+
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
