@@ -6,13 +6,13 @@ namespace HotelApp.Controllers
 {
     public class BookingController : Controller
     {
-        private readonly ApplicationDBContext _dbContext;
-        private readonly UnitOfWork _unitOfWork;
-        public BookingController(ApplicationDBContext dbContext, UnitOfWork unitOfWork)
-        {
-            _dbContext = dbContext;
-            _unitOfWork = unitOfWork;
-        }
+        //private readonly ApplicationDBContext _dbContext;
+        //private readonly UnitOfWork _unitOfWork;
+        //public BookingController(ApplicationDBContext dbContext, UnitOfWork unitOfWork)
+        //{
+        //    _dbContext = dbContext;
+        //    _unitOfWork = unitOfWork;
+        //}
         public IActionResult Index()
         {
             return View();
