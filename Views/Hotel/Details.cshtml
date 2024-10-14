@@ -27,7 +27,7 @@
         <img src="@ViewBag.Hotels.ImageUrl" alt="Hình ảnh Khách Sạn"
              style="height: 300px; object-fit: cover; cursor: zoom-in;"
              onclick="openModal(this)" />
-        <a asp-area="" asp-controller="" asp-action="BookingRoom" asp-route-id="" class="btn btn-primary btn-pm" style="position: absolute; margin-left: 10px; cursor: pointer; z-index:10; ">Đặt ngay</a>
+        <a asp-area="" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="" class="btn btn-primary btn-pm" style="position: absolute; margin-left: 10px; cursor: pointer; z-index:10; ">Đặt ngay</a>
 
         <!-- Lightbox Modal -->
         <div id="imageModal" style="display:none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
