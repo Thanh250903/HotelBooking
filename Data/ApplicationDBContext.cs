@@ -1,11 +1,12 @@
 ﻿
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Others;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelApp.Data
 {
-    public class ApplicationDBContext : DbContext
+    public class ApplicationDBContext : IdentityDbContext
     {
         public DbSet<Hotel> Hotels { get; set; }
         public DbSet<HotelReview> HotelReviews { get; set; }
