@@ -85,7 +85,7 @@ namespace HotelApp.Controllers
                 {
                     return NotFound("Room is not available for booking");
                 }
-
+                 // gặp lỗi khi cố gắng thêm User
                 //var user = await _userManager.GetUserAsync(User); 
                 //if (user == null)
                 //{
@@ -131,58 +131,60 @@ namespace HotelApp.Controllers
         [HttpGet]
         public IActionResult AcceptBooking(int bookingId)
         {
-            var booking = _unitOfWork.BookingRepository.GetFirstOrDefault(rb => rb.RoomBookingId == bookingId, includeProperties: "Room,User");
+            var booking = _unitOfWork.BookingRepository.Get(acceptbooking => acceptbooking.RoomBookingId == bookingId);
             if (booking == null)
             {
                 return NotFound("Cannot find booking's data");
             }
-            // access to payment
-            var paymentVM = new PaymentVM()
+            // access to donfirmbooking
+            var confirmbookingVM = new ConfirmBookingVM
             {
                 RoomBookingId = booking.RoomBookingId,
-                RoomId = booking.RoomId,
-                //UserId = booking.UserId,
-                TotalPrice = booking.TotalPrice,
+                // user will insert it
+                FullName = "", 
+                Nationality = "",
+                PhoneNumber = "",
+                Email = "",
+
             };
-            return View(paymentVM);
+            return View(confirmbookingVM);
         }
-        //[HttpPost]
-        //public async Task<IActionResult> AccpetBooking(PaymentVM paymentVM)
-        //{
-        //    Payment payment = new Payment
-        //    {
-        //        RoomBookingId = paymentVM.RoomBookingId,
-        //        UserId = paymentVM.UserId,
-        //        TotalPrice = paymentVM.TotalPrice,
-        //        Method = paymentVM.Method,
-        //        Status = payment.Status.Paid,
-        //        TransactionId = "TNX123456",
-        //        PaymentResponse "Payment success"
-        //    };
 
-        //    return View(paymentVM);
-        //}
+        [HttpPost]
+        public IActionResult AcceptBooking(ConfirmBookingVM confirmBookingVM)
+        {
+            if(ModelState.IsValid)
+            {
+                var booking = _unitOfWork.BookingRepository.Get(accpetbooking => accpetbooking.RoomBookingId == confirmBookingVM.RoomBookingId);
+                if (booking == null)
+                {
+                    return RedirectToAction("AccpetBooking", new
+                    {
+                        bookingId = confirmBookingVM.RoomBookingId,
+                    });
+                }
 
+                // may not logic, use Identity User
+                ConfirmBookingVM confirmBookingVM1 = new ConfirmBookingVM
+                {
+                    RoomBookingId= confirmBookingVM.RoomBookingId,
+                    FullName = confirmBookingVM.FullName,
+                    Nationality = confirmBookingVM.Nationality,
+                    PhoneNumber = confirmBookingVM.PhoneNumber,
+                    Email = confirmBookingVM.Email,
+                };
+                return RedirectToAction("Payment", "Payment", new 
+                { 
+                    bookingId = booking.RoomBookingId }
+                );
+
+            }
+            return View(confirmBookingVM);
+        }
 
        
 
-        //    return RedirectToAction("SubmitBooking", new
-        //    {
-        //        bookingId = booking.RoomBookingId
-        //    });
-        //}
-        // Confirm booking a room
-        //[HttpGet]
-        // public IActionResult SubmitBooking(int bookingId)
-        // {
-        //     var booking = _unitOfWork.BookingRepository.Include(roombooking => roombooking.Room)
-        //                   .FirstOrDefault(roombooking => roombooking.RoomBookingId == bookingId);
-        //     if (booking == null)
-        //     {
-        //         return NotFound("Cannot found booking information");
-        //     }
-        //     return View(booking);
-        // }
+       
 
         // Handle Payment process
         //[HttpPost]
