@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Views/Shared/_LoginPartial.cshtml
+/Migrations/20241014154312_update.cs
+/Migrations/20241014154312_update.cs

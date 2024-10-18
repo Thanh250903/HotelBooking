@@ -28,7 +28,6 @@
              style="height: 300px; object-fit: cover; cursor: zoom-in;"
              onclick="openModal(this)" />
 
-        <a asp-area="" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="" class="btn btn-primary btn-pm" style="position: absolute; margin-left: 10px; cursor: pointer; z-index:10; ">Đặt ngay</a>
 
 
         <!-- Lightbox Modal -->
@@ -104,6 +103,9 @@
                         <a asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-undo"></i> Return
                         </a>
+                        <a asp-area="" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
+                            <i class="fa fa-check-square"></i>
+                            Đặt ngay</a>
                     </td>
                 </tr>
             }
