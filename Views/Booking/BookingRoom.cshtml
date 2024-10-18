@@ -1,5 +1,50 @@
-﻿<h1>This is view for booking index</h1>
+﻿@model HotelApp.Models.Hotel.VM.BookingVM
+@if (TempData["success"] != null)
+{
+    <h1>@TempData["success"]</h1>
+}
+@if (TempData["error"] !=null)
+{
+    <h1>@TempData["error"]</h1>
+}
 
+<form method="post" class="container" asp-action="BookingRoom">
+    <input type="hidden" asp-for="HotelId" />
+    <input type="hidden" asp-for="RoomId" />
+    <div class="border p-4 rounded shadow-sm">
+        <div class="mb-3 row">
+            <label asp-for="@Model.RoomNumber" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="@Model.RoomNumber" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="mb-3 row">
+        <label asp-for="CheckInDate" class="control-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="CheckInDate" class="form-control" />
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="CheckOutDate" class="control-label"></label>
+        <div class="col-sm-10">
+             <input asp-for="CheckOutDate" class="form-control" />
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label asp-for="@Model.TotalPrice" class="control-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="@Model.TotalPrice" class="form-control" readonly />
+        </div>
+    </div>
+    </div>
+
+    <div class="text-center row">
+        <div class="col">
+        <button type="submit" class="btn btn-primary w-100">Đặt Ngay</button>
+        </div>
+    </div>
+  
+</form>
 @section Scripts {
     @{
         <partial name="_ValidationScriptsPartial" />

@@ -1,6 +1,7 @@
 ﻿using HotelApp.Data;
 using HotelApp.Models.Hotel;
 using HotelApp.Repository.IRepository;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace HotelApp.Repository
@@ -19,7 +20,8 @@ namespace HotelApp.Repository
         
         public Room GetById(int id)
         {
-            return _dbContext.Rooms.Find(id);
+            return _dbContext.Rooms.Include(room => room.Hotel)
+                             .FirstOrDefault(room => room.RoomId == id);
         }
         // querry room by id
         // lấy ds phòng của một khách sạn cụ thể
@@ -46,5 +48,9 @@ namespace HotelApp.Repository
             return !_dbContext.Rooms.Any(r => r.HotelId == hotelId && r.RoomNumber == roomNumber);
         }
 
+        public async Task<Room> GetRoomById(int roomId)
+        {
+            return await _dbContext.Rooms.FindAsync(roomId);
+        }
     }
 }

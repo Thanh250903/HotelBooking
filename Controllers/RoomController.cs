@@ -34,6 +34,10 @@ namespace HotelApp.Controllers
             //AppDomain/CreateRoom?id=23&searchTerm="ưèwè"
             // get hotel id from route
             var hotel = _unitOfWork.HotelRepository.GetById(id);
+            if(hotel == null)
+            {
+                return NotFound("Cannot find the hotel to create room");
+            }
             RoomVM roomVM = new RoomVM
             {
                 HotelId = id,
