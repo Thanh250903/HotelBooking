@@ -23,16 +23,27 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // cấu hình Identity
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDBContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false; // Cho phép đăng nhập mà không cần xác nhận
+})
+.AddEntityFrameworkStores<ApplicationDBContext>()
+.AddDefaultTokenProviders();
+//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) // false nếu chưa muốn xác nhận tk
+//    //.AddRoles<IdentityRole>()
+//    .AddEntityFrameworkStores<ApplicationDBContext>()
+//    .AddDefaultTokenProviders();
+
+
+//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+//        .AddEntityFrameworkStores<ApplicationDBContext>()
+//        .AddDefaultTokenProviders();
 
 //builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 //{
 //    options.SignIn.RequireConfirmedAccount = true; // hoặc true nếu bạn cần xác nhận tài khoản
 //})
-//.AddEntityFrameworkStores<ApplicationDBContext>()
+//.AddEntityFrameworkStores<ApplicationDBContext>();
 
 //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
 //    .AddRoles<IdentityRole>()
@@ -45,9 +56,10 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 // Thêm dịch vụ cho Razor Pages (để có giao diện UI)
 builder.Services.AddRazorPages();
-builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddRazorPages();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddOptions();
 

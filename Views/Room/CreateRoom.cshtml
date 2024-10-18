@@ -3,6 +3,10 @@
 {
     <h1>@TempData["success"]</h1>
 }
+@if (TempData["error"] != null)
+{
+    <h1>@TempData["error"]</h1>
+}
 
 <h1 class="text-center my-4">Add room for: @Model.HotelName</h1>
 <form method="post" enctype="multipart/form-data" class="container" asp-action="CreateRoom">
