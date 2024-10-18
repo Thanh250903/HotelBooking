@@ -9,6 +9,7 @@ namespace HotelApp.Repository
        public IHotelRepository HotelRepository { get; set; }
        public IRoomRepository RoomRepository { get; set; }
        public IBookingRepository BookingRepository { get; set; }
+       public IPaymentRepository PaymentRepository { get; set; }
 
        public UnitOfWork(ApplicationDBContext dbContext)
         {
@@ -16,6 +17,7 @@ namespace HotelApp.Repository
             HotelRepository = new HotelRepository(dbContext);
             RoomRepository = new RoomRepository(dbContext);
             BookingRepository = new BookingRepository(dbContext);
+            PaymentRepository = new PaymentRepository(dbContext);
         }
         public void Save()
         {
