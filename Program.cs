@@ -23,12 +23,10 @@ builder.Services.AddDbContext<ApplicationDBContext>(options =>
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // cấu hình Identity
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = false; // Cho phép đăng nhập mà không cần xác nhận
-})
-.AddEntityFrameworkStores<ApplicationDBContext>()
-.AddDefaultTokenProviders();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDBContext>()
+    .AddDefaultTokenProviders();
 //builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) // false nếu chưa muốn xác nhận tk
 //    //.AddRoles<IdentityRole>()
 //    .AddEntityFrameworkStores<ApplicationDBContext>()
