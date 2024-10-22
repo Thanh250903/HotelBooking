@@ -1,0 +1,12 @@
+﻿@using Microsoft.AspNetCore.Mvc.ViewFeatures
+
+@{
+    var statusMessage = ViewData["StatusMessage"] as string;
+}
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <div class="alert alert-info">
+        @statusMessage
+    </div>
+}

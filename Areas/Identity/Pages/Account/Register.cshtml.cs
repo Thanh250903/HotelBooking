@@ -45,7 +45,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
             RoleManager<IdentityRole> roleManager,
             IEmailSender emailSender,
             IUnitOfWork unitOfWork,
-            ApplicationDBContext dBContext)
+            ApplicationDBContext dbContext)
 
         {
             _userManager = userManager;
@@ -55,6 +55,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
+            _dbContext = dbContext;
         }
 
         /// <summary>
@@ -82,10 +83,12 @@ namespace HotelApp.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+            [Required]
+            [Display(Name ="Name")]
+            public string Name { get; set; }
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
@@ -94,6 +97,9 @@ namespace HotelApp.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            [Required]
+            [Display(Name = "Gender")]
+            public bool Gender {  get; set; }
             [Required]
             [Display(Name = "Your phone number")]
             public string PhoneNumber { get; set; }
@@ -123,47 +129,46 @@ namespace HotelApp.Areas.Identity.Pages.Account
                 {
                     UserName = Input.Email,
                     Email = Input.Email,
+                    Name = Input.Name,
                     EmailConfirmed = true,
                     UserAddress = Input.Address,
                     PhoneNumber = Input.PhoneNumber,
+                    UserPhoneNumber = Input.PhoneNumber,
+                    Role = Input.Role,
                 };
-                var checkMailExists = _dbContext.Users.Any(x => x.Email == user.Email);
-                if (checkMailExists)
+                //if (!Input.Email.Contains("@"))
+                //{
+                //    ModelState.AddModelError(string.Empty, "Email account must have @ character");
+                //    return Page();
+                //}
+                if (!new EmailAddressAttribute().IsValid(Input.Email))
+                {
+                    ModelState.AddModelError(string.Empty, "Email is not valid.");
+                    return Page();
+                }
+                var checkMailExists = await _userManager.FindByEmailAsync(user.Email);
+                    //_dbContext.Users.Any(x => x.Email == user.Email);
+                if (checkMailExists !=null)
                 {
                     GetRoles();
                     TempData["error"] = "User with this email already exists!";
                     return Page();
                 }
-
                 //await _userStore.SetUserNameAsync((ApplicationUser)user, Input.Email, CancellationToken.None);
                 //await _emailStore.SetEmailAsync((ApplicationUser)user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync((ApplicationUser)user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("Create account success");
                     // Notification
                     if (Input.Role == "User")
                     {
                         await _userManager.AddToRolesAsync(user, new[] { "User" });
-                        TempData["success"] = "Adding Successfully";
+                        TempData["success"] = "Create account successfully";
+                        //await _signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("Index", "Home");
                     }
-                    //await _userManager.AddToRoleAsync(user, "User");
-                    // login
-                    //await _signInManager.SignInAsync(user, isPersistent: false);
-
-                    //var userId = await _userManager.GetUserIdAsync((ApplicationUser)user);
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync((ApplicationUser)user);
-                    //code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    //var callbackUrl = Url.Page(
-                    //    "/Account/ConfirmEmail",
-                    //    pageHandler: null,
-                    //    values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                    //    protocol: Request.Scheme);
-
-                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
@@ -184,20 +189,6 @@ namespace HotelApp.Areas.Identity.Pages.Account
             GetRoles();
             return Page();
         }
-
-        //private IdentityUser CreateUser()
-        //{
-        //    try
-        //    {
-        //        return Activator.CreateInstance<ApplicationUser>();
-        //    }
-        //    catch
-        //    {
-        //        throw new InvalidOperationException($"Can't create an instance of '{nameof(IdentityUser)}'. " +
-        //            $"Ensure that '{nameof(IdentityUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-        //            $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-        //    }
-        //}
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
