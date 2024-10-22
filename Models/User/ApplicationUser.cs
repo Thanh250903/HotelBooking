@@ -6,6 +6,8 @@ namespace HotelApp.Models.Others
 {
     public class ApplicationUser :IdentityUser
     {
+        [Required]
+        public string Name {  get; set; }
         public string UserPhoneNumber { get; set; }
         [ValidateNever]
         public string UserAddress { get; set; }

@@ -2,7 +2,6 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using System.Collections
 @model IEnumerable<ApplicationUser>
-
 @if (TempData["EditUserMessage"] != null && (bool)TempData["ShowMessage"])
 {
     <div id="editUserMessage" class="alert alert-warning">@TempData["EditUserMessage"]</div>

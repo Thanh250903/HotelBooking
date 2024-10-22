@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using HotelApp.Models.Others;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HotelApp.Areas.Identity.Pages.Account
 {
@@ -22,11 +23,13 @@ namespace HotelApp.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger, UserManager<ApplicationUser> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
         }
 
 
@@ -73,24 +76,37 @@ namespace HotelApp.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                if (!Input.Email.Contains("@"))
+                {
+                    ModelState.AddModelError(string.Empty, "Email account must have @ character");
+                    return Page();
+                }
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    if (User.IsInRole("Admin"))
+                    var user = await _userManager.FindByEmailAsync(Input.Email);
+                    if(await _userManager.IsInRoleAsync(user, "Admin"))
                     {
                         return Redirect("Admin/Home/Index");
                     }
-                    if (User.IsInRole("User"))
+                    else if (await _userManager.IsInRoleAsync(user, "Owner"))
                     {
-                        return Redirect("User/Home/Index");
+                        return Redirect("Owner/Home/Index");
                     }
-                    _logger.LogInformation("User logged in.");
+                    else if (await _userManager.IsInRoleAsync(user, "Staff"))
+                    {
+                        return Redirect("Staff/Home/Index");
+                    }
+                    else if (await _userManager.IsInRoleAsync(user, "User"))
+                    {
+                        return Redirect("/Home/Index");
+                    }
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
                 {
+                    _logger.LogWarning("Requires two factor authentication.");
                     return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
                 }
                 if (result.IsLockedOut)
@@ -100,6 +116,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                 }
                 else
                 {
+                    _logger.LogWarning($"Login failed for {Input.Email}. Result: {result}");
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return Page();
                 }
