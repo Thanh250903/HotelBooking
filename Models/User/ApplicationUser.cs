@@ -19,5 +19,7 @@ namespace HotelApp.Models.Others
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [ValidateNever]
         public bool IsActive { get; set; } = true; // Active status
+        [ValidateNever]
+        public string? ProfilePicture {  get; set; } = "/img/user_image/default-avatar2.png"; 
     }
 }
