@@ -1,7 +1,9 @@
 ﻿@using HotelApp.Models.Others
 @using Microsoft.AspNetCore.Identity
+@using HotelApp.Utility
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject UserManageProfile UserManagerProfile
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -119,7 +121,10 @@
                                 </li>
                             }
                         </ul>
-
+                        @{
+                            // Lấy thông tin người dùng hiện tại
+                            var userPicture = await UserManagerProfile.GetUserPicture(User);
+                        }
                         <ul class="navbar-nav">
                             @if (User.IsInRole("Admin") || User.IsInRole("Owner") || User.IsInRole("Staff") || User.IsInRole("User"))
                             {
@@ -127,6 +132,7 @@
                                 <div class="nav-item dropdown">
                                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Edit Profile</a>
                                     <div class="dropdown-menu rounded-0 m-0">
+                                        <img src="@userPicture" alt="User_Avatar" style="width: 150px; height: 150px; border-radius:50%;" />
                                         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">Profile</a>
                                         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" title="Change Password">Change Password</a>
                                     </div>

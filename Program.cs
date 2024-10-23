@@ -42,6 +42,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddRoles<IdentityRole>()
     //.AddUserManager<UserManager<ApplicationUser>>()
     //.AddSignInManager<SignInManager<ApplicationUser>>()
+    //.AddUserManager<UserManageProfile>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders();
 
@@ -53,6 +54,7 @@ builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAutoCreateRole, RoleCreater>();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<UserManageProfile>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddOptions();
 
