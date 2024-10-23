@@ -6,9 +6,11 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using HotelApp.Models.Hotel;
 using HotelApp.Models.Others;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HotelApp.Areas.Identity.Pages.Account.Manage
@@ -17,13 +19,17 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            IWebHostEnvironment webHostEnvironment)
+
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         /// <summary>
@@ -45,6 +51,8 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
         /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
+        [BindProperty]
+        public IFormFile ProfilePicture { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -86,14 +94,37 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(IFormFile profilePicture)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+            if(profilePicture != null && profilePicture.Length > 0)
+            {
+                string wwwRootPath = _webHostEnvironment.WebRootPath;
+                var path = Path.Combine(wwwRootPath, "img", "user_image");
+                if (!string.IsNullOrEmpty(user.ProfilePicture))
+                {
+                    var oldImagePath = Path.Combine(wwwRootPath, user.ProfilePicture.TrimStart('/'));
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath); // Xóa ảnh cũ
+                    }
+                }
 
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(profilePicture.FileName);
+                var filePath = Path.Combine(path, fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await profilePicture.CopyToAsync(stream);
+                }
+                user.ProfilePicture = "/img/user_image/" + fileName;
+                await _userManager.UpdateAsync(user);
+                return RedirectToAction("Index");
+            }
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
