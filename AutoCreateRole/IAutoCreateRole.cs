@@ -2,6 +2,6 @@
 {
     public interface IAutoCreateRole
     {
-        void CreateRole();
+        Task CreateRole();
     }
 }

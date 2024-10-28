@@ -105,15 +105,14 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 var path = Path.Combine(wwwRootPath, "img", "user_image");
-                if (!string.IsNullOrEmpty(user.ProfilePicture))
-                {
-                    var oldImagePath = Path.Combine(wwwRootPath, user.ProfilePicture.TrimStart('/'));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath); // Xóa ảnh cũ
-                    }
-                }
-
+                //if (!string.IsNullOrEmpty(user.ProfilePicture))
+                //{
+                //    var oldImagePath = Path.Combine(wwwRootPath, user.ProfilePicture.TrimStart('/'));
+                //    if (System.IO.File.Exists(oldImagePath))
+                //    {
+                //        System.IO.File.Delete(oldImagePath); // Xóa ảnh cũ
+                //    }
+                //}
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(profilePicture.FileName);
                 var filePath = Path.Combine(path, fileName);
 

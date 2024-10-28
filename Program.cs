@@ -60,11 +60,12 @@ builder.Services.AddOptions();
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var dbCreate = scope.ServiceProvider.GetRequiredService<IAutoCreateRole>();
-//    dbCreate.CreateRole();
-//}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var createRoleService = services.GetRequiredService<IAutoCreateRole>();
+    createRoleService.CreateRole().GetAwaiter().GetResult();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -85,28 +86,10 @@ app.UseRouting();
 
 app.UseAuthentication(); // xác thực người dùng
 app.UseAuthorization(); // phân quyền
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-
-    try
-    {
-        // Get the RoleCreater service and call CreateRole
-        var roleCreator = services.GetRequiredService<IAutoCreateRole>();
-        roleCreator.CreateRole();
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while creating roles.");
-    }
-}
-
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
+
 
 app.Run();
