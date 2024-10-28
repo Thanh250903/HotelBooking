@@ -3,30 +3,55 @@
 @using System.Collections
 @model IEnumerable<ApplicationUser>
 @{
-    ViewData["Title"] = "Quản lý người dùng";
+    ViewData["Title"] = "Manage User";
 }
-@if (TempData["EditUserMessage"] != null && (bool)TempData["ShowMessage"])
+
+@if (TempData["ShowMessageEdit"] != null && (bool)TempData["ShowMessageEdit"] == true)
 {
-    <div id="editUserMessage" class="alert alert-warning">@TempData["EditUserMessage"]</div>
+    <div id="editUserMessage" class="alert alert-success">@TempData["successEdit"]</div>
     <script>
         setTimeout(function () {
             $("#editUserMessage").fadeOut("slow");
         }, 5000);
     </script>
+    TempData["ShowMessageEdit"] = false;
 }
-else if (TempData["DeleteUserMessage"] != null && (bool)TempData["ShowMessage"])
+
+else if (TempData["ShowMessageDeleted"] != null && (bool)TempData["ShowMessageDeleted"] == true)
 {
-    <div id="deleteUserMessage" class="alert alert-danger">@TempData["DeleteUserMessage"]</div>
+    <div id="deleteUserMessage" class="alert alert-danger">@TempData["successDeleted"]</div>
     <script>
         setTimeout(function () {
             $("#deleteUserMessage").fadeOut("slow");
+        }, 5000);
+    </script>
+    TempData["ShowMessageDeleted"] = false;
+}
+
+else if (TempData["ShowMessageResetPassword"] != null && (bool)TempData["ShowMessageResetPassword"] == true)
+{
+    <div id="resetPasswordMessage" class="alert alert-info">@TempData["successResetPassword"]</div>
+    <script>
+        setTimeout(function () {
+            $("#resetPasswordMessage").fadeOut("slow");
+        }, 5000);
+    </script>
+    TempData["ShowMessageResetPassword"] = false;
+}
+
+else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["ShowMessageLockAccount"].ToString(), out bool showMessageLockAccount) && showMessageLockAccount)
+{
+    <div id="lockAccountMessage" class="alert alert-warning">@TempData["successLockAccount"]</div>
+    <script>
+        setTimeout(function () {
+            $("#lockAccountMessage").fadeOut("slow");
         }, 5000);
     </script>
 }
 
 @if (Model.Any())
 {
-    <div class="book-container">
+    <div class="account-container">
         <div>
             <h1>List of Account</h1>
         </div>
