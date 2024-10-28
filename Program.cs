@@ -4,12 +4,16 @@ using HotelApp.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using HotelApp.Models.Others;
+using HotelApp.AutoCreateRole;
+using HotelApp.CreateDB;
+using HotelApp.Utility;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddDistributedMemoryCache();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -20,39 +24,27 @@ builder.Services.ConfigureApplicationCookie(options =>
 // cấu hình DbContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(connectionString));
-builder.Services.AddDbContext<ApplicationDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<ApplicationDBContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // cấu hình Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
-    options.SignIn.RequireConfirmedAccount = false; // Cho phép đăng nhập mà không cần xác nhận
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+    options.SignIn.RequireConfirmedAccount = false;
+    options.SignIn.RequireConfirmedEmail = false;    
+    options.SignIn.RequireConfirmedPhoneNumber = false;
 })
-.AddEntityFrameworkStores<ApplicationDBContext>()
-.AddDefaultTokenProviders();
-//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) // false nếu chưa muốn xác nhận tk
-//    //.AddRoles<IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDBContext>()
-//    .AddDefaultTokenProviders();
-
-
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-//        .AddEntityFrameworkStores<ApplicationDBContext>()
-//        .AddDefaultTokenProviders();
-
-//builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-//{
-//    options.SignIn.RequireConfirmedAccount = true; // hoặc true nếu bạn cần xác nhận tài khoản
-//})
-//.AddEntityFrameworkStores<ApplicationDBContext>();
-
-//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-//    .AddRoles<IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDBContext>()
-//    .AddDefaultTokenProviders();
-
-//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-//    .AddRoles<IdentityRole>()
-//    .AddEntityFrameworkStores<ApplicationDBContext>();
+    .AddRoles<IdentityRole>()
+    //.AddUserManager<UserManager<ApplicationUser>>()
+    //.AddSignInManager<SignInManager<ApplicationUser>>()
+    //.AddUserManager<UserManageProfile>()
+    .AddEntityFrameworkStores<ApplicationDBContext>()
+    .AddDefaultTokenProviders();
 
 // Thêm dịch vụ cho Razor Pages (để có giao diện UI)
 builder.Services.AddRazorPages();
@@ -60,10 +52,20 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
+builder.Services.AddScoped<IAutoCreateRole, RoleCreater>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<UserManageProfile>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddOptions();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var createRoleService = services.GetRequiredService<IAutoCreateRole>();
+    createRoleService.CreateRole().GetAwaiter().GetResult();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -88,6 +90,6 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
+
 
 app.Run();

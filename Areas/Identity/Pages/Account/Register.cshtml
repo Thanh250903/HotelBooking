@@ -4,9 +4,148 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container h-100">
+<div class="row d-flex justify-content-center align-items-center h-50">
+    <div class="">
+        <div class="card-body p-md-5">
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
 
-<div class="row">
+                    <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Register account</p>
+
+                    <form class="mx-1 mx-md-4" id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="d-flex flex-row align-items-center mb-4">
+                            <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0">
+                                <label asp-for="Input.Email">Email</label>
+                                <input asp-for="Input.Email" class="form-control border" autocomplete="useremail" aria-required="true" placeholder="name@example.com" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                        </div>
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                <div class="form-outline flex-fill mb-0">
+                                    <label asp-for="Input.Name">Name</label>
+                                    <input asp-for="Input.Name" class="form-control border" autocomplete="name" aria-required="true" placeholder="yourname" />
+                                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                                </div>
+                            </div>
+                        <div class="d-flex flex-row align-items-center mb-4">
+                            <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0">
+                                <label asp-for="Input.Password">Password</label>
+                                <input asp-for="Input.Password" class="form-control border" autocomplete="new-password" aria-required="true" placeholder="password" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0">
+                                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                                <input asp-for="Input.ConfirmPassword" class="form-control border" autocomplete="new-password" aria-required="true" placeholder="confirmpassword" />
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                            <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fa fa-check-circle  fa-lg me-3 fa-fw"></i>
+                                <div class="form-outline flex-fill mb-0">
+                                    <label asp-for="Input.Gender">Gender</label>
+                                    <div>
+                                        <label for="male">Male</label>
+                                        <input type="radio" id="male" name="Input.Gender" class="form-check-input" value="true" />
+                                        <i class="fa fa-mars fa-lg me-3 fa-fw"></i>
+                                    </div>
+                                    <div>
+                                        <label for="female">Female</label>
+                                        <input type="radio" id="female" name="Input.Gender" class="form-check-input" value="false" />
+                                        <i class="fa fa-venus fa-lg me-3 fa-fw"></i>
+                                    </div>
+                                    <span asp-validation-for="Input.Gender" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                        <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-map fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0">
+                                <label asp-for="Input.Address">Address</label>
+                                <input asp-for="Input.Address" class="form-control border" autocomplete="homeadress" aria-required="true" placeholder="address" />
+                                <span asp-validation-for="Input.Address" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-row align-items-center mb-4">
+                                <i class="fas fa-mobile fa-lg me-3 fa-fw"></i>
+                            <div class="form-outline flex-fill mb-0">
+                                <label asp-for="Input.PhoneNumber">Phone</label>
+                                <input asp-for="Input.PhoneNumber" class="form-control border" autocomplete="phone" aria-required="true" placeholder="phonenumber" />
+                                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                            <div class="d-flex flex-row align-items-center mb-4" style="display:none;">
+                                <i class="fas fa-users fa-lg me-3 fa-fw"></i>
+                                <div class="form-outline flex-fill mb-0">
+                                    @Html.DropDownListFor(n => n.Input.Role, Model.Input.SelectYourRole,
+                                             "Please select the role", new { @class = "form-control border", @value = "User" })
+                                    <span id="role-validation" class="text-danger">@Html.ValidationMessageFor(m => m.Input.Role)</span>
+                                </div>
+                            </div>
+
+                        <div class="form-check d-flex justify-content-center mb-5">
+                            <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3c" />
+                            <label class="form-check-label" for="form2Example3">
+                                I agree all statements in <a asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </label>
+                        </div>
+                        <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
+                            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+                        </div>
+                    </form>
+
+                </div>
+                <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2 ">
+
+                        <!-- Carousel -->
+                        <div class="container-fluid mb-4">
+                            <div id="registerCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <!-- Carousel indicators -->
+                                <ol class="carousel-indicators">
+                                    <li data-bs-target="#registerCarousel" data-bs-slide-to="0" class="active"></li>
+                                    <li data-bs-target="#registerCarousel" data-bs-slide-to="1"></li>
+                                    <li data-bs-target="#registerCarousel" data-bs-slide-to="2"></li>
+                                </ol>
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img class="border-2 bg-white" style="border-radius: 80px; width: 100%; height: 100%; object-fit: fill;" src="~/img/f5061af8-7499-4f3d-b38f-d92505e72cd9.jpg" />
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img class="border-2 bg-white" style="border-radius: 80px; width: 100%; height: 100%; object-fit: cover;" src=~/img/about-2.jpg />
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img class="border-2 bg-white" style="border-radius: 80px; width: 100%; height: 100%; object-fit: cover;" src="~/img/about-4.jpg" />
+                                    </div>
+                                </div>
+                                <!-- Carousel controls -->
+                                <a class="carousel-control-prev" href="registerCarousel" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                </a>
+                                <a class="carousel-control-next" href="#registerCarousel" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                </a>
+                            </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+  
+  
+
+
+@* <div class="row">
     <div class="col-md-4">
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <h2>Create a new account.</h2>
@@ -32,19 +171,9 @@
     </div>
     <div class="col-md-6 col-md-offset-2">
         <section>
-            <h3>Use another service to register.</h3>
             <hr />
             @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
+                if ((Model.ExternalLogins?.Count ?? 0) >= 1)
                 {
                     <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
                         <div>
@@ -61,7 +190,7 @@
         </section>
     </div>
 </div>
-
+ *@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

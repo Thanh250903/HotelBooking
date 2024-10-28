@@ -30,7 +30,7 @@
     <Folder Include="Areas\Owner\Views\" />
     <Folder Include="Areas\Staff\Views\" />
     <Folder Include="Areas\SystemManager\Views\" />
-    <Folder Include="Areas\User\Views\" />
+    <Folder Include="Areas\Users\Views\" />
     <Folder Include="Views\Room\" />
   </ItemGroup>
 
@@ -75,6 +75,13 @@
     <None Include="wwwroot\lib\jquery\dist\jquery.js" />
     <None Include="wwwroot\lib\jquery\dist\jquery.min.js" />
     <None Include="wwwroot\lib\jquery\dist\jquery.min.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\img\luxuryhotel.jpg">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

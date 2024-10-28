@@ -1,14 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@using HotelApp.Models.Others
+@using Microsoft.AspNetCore.Identity
+@using HotelApp.Utility
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject UserManageProfile UserManagerProfile
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    @* <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HotelApp</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/HotelApp.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
- *@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     <meta charset="utf-8">
@@ -46,7 +44,7 @@
             <!-- Kh có khoảng trống ngang giữa các cột trong các hàng đó -->
             <div class="row gx-0">
                 <div class="col-lg-3 bg-dark d-none d-lg-block">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
                         <h1 class="m-0 text-primary text-uppercase">Booking.com</h1>
                     </a>
             </div>
@@ -80,25 +78,108 @@
                             <span class="navbar-toggler-icon"></span>
                         </button>
 
-                        <div class="navbar-nav mr-auto py-0 justify-content-between" >
-                            <div class="navbar-nav mr-auto py-0">
-                                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-item nav-link ">Home</a>
-                                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="nav-item nav-link ">Privacy</a>
-                                <a asp-area="" asp-controller="Home" asp-action="AboutUs" class="nav-item nav-link ">About Us</a>
-                                <a asp-area="" asp-controller="Home" asp-action="Services" class="nav-item nav-link ">Services</a>
-                                <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-item nav-link">Contact</a>
-
-                                <div class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
-                                    <div class="dropdown-menu rounded-0 m-0">
-                                        <a asp-area="" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
-                                        <a asp-area="" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
-                                        <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a>
-                                        <a href="testimonial.html" class="dropdown-item">Review</a>
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="nav justify-content-center">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a asp-area="" asp-controller="Users" asp-action="Index">List of Accounts |</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a asp-area="Identity" asp-controller="Users" asp-action="ConfirmAccount"> List of confirm account</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <div class="navbar-nav mr-auto py-0 justify-content-between">
+                                    <div class="navbar-nav mr-auto py-0">
+                                        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-item nav-link ">Home</a>
+                                        <a asp-area="" asp-controller="Home" asp-action="Privacy" class="nav-item nav-link ">Privacy</a>
+                                        <a asp-area="" asp-controller="Home" asp-action="AboutUs" class="nav-item nav-link ">About Us</a>
+                                        <a asp-area="" asp-controller="Home" asp-action="Services" class="nav-item nav-link ">Services</a>
+                                        <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-item nav-link">Contact</a>
+                                        <div class="nav-item dropdown">
+                                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
+                                            <div class="dropdown-menu rounded-0 m-0">
+                                                <a asp-area="" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
+                                                <a asp-area="" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
+                                                <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a>
+                                                <a href="testimonial.html" class="dropdown-item">Review</a>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>                            
-                            </div>
-                        </div >
+                                </div>
+                            }
+                            @if (User.IsInRole("Owner"))
+                            {
+                                <li class="nav-item">
+                                    <a  asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel">Create hotel</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a  asp-area="Owner" asp-controller="Hotel" asp-action="Index">Hotel information</a>
+                                </li>
+                            }
+                            @if (User.IsInRole("Staff"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark " asp-area="Student" asp-controller="Article" asp-action="MyArticles">My Contribution</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark " asp-area="Student" asp-controller="Article" asp-action="SemesterList">Choose Semester</a>
+                                </li>
+                            }
+                        </ul>
+                        @{
+                            // Lấy thông tin người dùng hiện tại
+                            var userPicture = await UserManagerProfile.GetUserPictureAsync(User);
+                        }
+                        <ul class="navbar-nav">
+                            @if (User.IsInRole("Admin") || User.IsInRole("Owner") || User.IsInRole("Staff") || User.IsInRole("User"))
+                            {
+                                <p id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><b style="color:coral">Hello,  </b> <span style="color: #FEA116">@UserManager.GetUserName(User)</span></p>
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Edit Profile</a>
+                                    <div class="dropdown-menu rounded-0 m-0">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Index">
+                                            <img src="@userPicture" alt="User_Avatar" style="width: 150px; height: 150px; border-radius:50%;" />
+                                        </a>
+                                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" title="Change Password">Change Password</a>
+                                    </div>
+                                </div>
+                            }
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                <li class="nav-item">
+                                    <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                        <button id="logout" type="submit" class="nav-link btn btn-link text-dark border-0"><b 
+                                               style="font-size: 15px; text-transform: uppercase; background-color: white; color: black; padding: 10px 15px; border-radius: 5px;"
+                                               onmouseover="this.style.backgroundColor='#0056b3'; this.style.color='white';"
+                                               onmouseout="this.style.backgroundColor='white'; this.style.color='black';">Logout</b>
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    @*      <div class="navbar-nav mr-auto py-0 justify-content-between" >
+                    <div class="navbar-nav mr-auto py-0">
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-item nav-link ">Home</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy" class="nav-item nav-link ">Privacy</a>
+                    <a asp-area="" asp-controller="Home" asp-action="AboutUs" class="nav-item nav-link ">About Us</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Services" class="nav-item nav-link ">Services</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-item nav-link">Contact</a>
+
+                    <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
+                    <div class="dropdown-menu rounded-0 m-0">
+                    <a asp-area="" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
+                    <a asp-area="" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
+                    <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a>
+                    <a href="testimonial.html" class="dropdown-item">Review</a>
+                    </div>
+                    </div>
+                    </div>
+                    </div >  *@
                     <div>
                         <partial name="_LoginPartial" />
                     </div>
@@ -141,7 +222,7 @@
                         <span class="carousel-control-next-icon"></span>
                     </a>
                 </div>
-                @* <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelApp</a> *@
+                 @* <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HotelApp</a> *@
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
