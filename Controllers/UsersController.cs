@@ -62,20 +62,21 @@ namespace HotelApp.Controllers
             {
                 return NotFound("User not found");
             }
-            var manageUser = _dbContext.User.Find(user.Id);
+
+            var manageUser = _dbContext.Users.Find(user.Id);
             if (manageUser == null)
             {
                 return NotFound("User not found");
             }
+
             manageUser.Name = user.Name;
             manageUser.PhoneNumber = user.PhoneNumber;
             manageUser.UserAddress = user.UserAddress;
             manageUser.UserGender = user.UserGender;
-
             _dbContext.Users.Update(manageUser);
             _dbContext.SaveChanges();
-            TempData["success"] = "Users edited successfully";
-            TempData["ShowMessage"] = true;
+            TempData["successEdit"] = "Users edited successfully";
+            TempData["ShowMessageEdit"] = true;
             return RedirectToAction(nameof(Index));
         }
 
@@ -84,7 +85,6 @@ namespace HotelApp.Controllers
             var user = _dbContext.Users.Find(id);
             var roleTemp = await _userManager.GetRolesAsync(user);
             var role = roleTemp.First();
-
             return RedirectToAction("EditUser", new { id });
         }
        
@@ -92,13 +92,13 @@ namespace HotelApp.Controllers
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound("User not found");
             }
             await _userManager.DeleteAsync(user);
-            TempData["success"] = "User deleted successfully";
-            TempData["ShowMessage"] = true;
+            TempData["successDeleted"] = "User deleted successfully";
+            TempData["ShowMessageDeleted"] = true;
             return RedirectToAction(nameof(Index));
         }
 
@@ -127,7 +127,8 @@ namespace HotelApp.Controllers
             var result = await _userManager.ResetPasswordAsync(user, code, password);
             if (result.Succeeded)
             {
-                TempData["success"] = $"Password reset successfully! for (Email:  {user.UserName})";
+                TempData["successResetPassword"] = $"Password reset successfully! for (Email:  {user.UserName})";
+                TempData["ShowMessageResetPassword"] = true;
                 return RedirectToAction("Index");
             }
             
@@ -158,21 +159,20 @@ namespace HotelApp.Controllers
         [HttpGet]
         public async Task<IActionResult> LockAccount(string id)
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var lockingUser = _dbContext.Users.Where(user => user.Id == id).First();
-
-            if(lockingUser.Id  == claims.Value)
+            var lockingUser = await _dbContext.Users.FindAsync(id);
+            if (lockingUser == null)
             {
-
+                return NotFound("User not found");
             }
 
             if (lockingUser.LockoutEnd != null && lockingUser.LockoutEnd > DateTime.Now)
                 lockingUser.LockoutEnd = DateTime.Now;
             else
-               lockingUser.LockoutEnd = DateTime.Now.AddYears(1000);
-            _dbContext.SaveChanges();
-            TempData["success"] = "Locking User successfully";
+                lockingUser.LockoutEnd = DateTime.Now.AddYears(1000);
+
+            await _dbContext.SaveChangesAsync();
+            TempData["successLockAccount"] = "User account locked/unlocked successfully";
+            TempData["ShowMessageLockAccount"] = true;
             return RedirectToAction(nameof(Index));
         }
     }

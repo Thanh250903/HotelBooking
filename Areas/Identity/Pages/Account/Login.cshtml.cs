@@ -102,26 +102,25 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     {
                         return Redirect("/Home/Index");
                     }
-
                     return LocalRedirect(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    _logger.LogWarning("Requires two factor authentication.");
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("/Account/Manage/Lockout");
-                }
-                else
-                {
-                    _logger.LogWarning($"Login failed for {Input.Email}. Result: {result}");
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
-                }
-            }
+                    }
+                    if (result.RequiresTwoFactor)
+                    {
+                        _logger.LogWarning("Requires two factor authentication.");
+                        return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    }
+                    if (result.IsLockedOut)
+                    {
+                        _logger.LogWarning("User account locked out.");
+                        return RedirectToPage("/Account/Manage/Lockout");
+                    }
+                        else
+                        {
+                            _logger.LogWarning($"Login failed for {Input.Email}. Result: {result}");
+                            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                            return Page();
+                        }
+                    }
 
             // If we got this far, something failed, redisplay form
             return Page();
