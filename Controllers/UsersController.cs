@@ -10,36 +10,40 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 
 namespace HotelApp.Controllers
 {
-    [Area("Admin")]
+    //[Area("Admin")]
     [Authorize(Roles = "Admin")]
-    public class UserController : Controller
+    public class UsersController : Controller
     {
         private readonly ApplicationDBContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserController(ApplicationDBContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsersController(ApplicationDBContext dbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
             _roleManager = roleManager;
         }
-
         public async Task<IActionResult> Index()
         {
             var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claims = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            var userList = _dbContext.Users.Where(user => user.Id != claims.Value);
-            
+            var claims = claimsIdentity.FindFirst(ClaimsIdentity.DefaultNameClaimType);
+
+            // take user list
+            var userList = await _dbContext.Users.Where(user => user.Id != claims.Value).ToListAsync();
+            if(userList == null || !userList.Any())
+            {
+                return NotFound("User not found");
+            }
+            // update role in table
             foreach(var user in userList)
             {
                 var userTemp = await _userManager.FindByIdAsync(user.Id);
-                if (userTemp != null)
+                if(userTemp!= null)
                 {
-                    return NotFound();
+                    var roleTemp = await _userManager.GetRolesAsync(userTemp);
+                    user.Role = roleTemp.FirstOrDefault();
                 }
-                var roleTemp = await _userManager.GetRolesAsync(userTemp);
-                user.Role = roleTemp.FirstOrDefault();
             }
             return View(userList);
         }
@@ -123,7 +127,7 @@ namespace HotelApp.Controllers
             var result = await _userManager.ResetPasswordAsync(user, code, password);
             if (result.Succeeded)
             {
-                TempData["success"] = $"Password reset successfully! for (Email:  {user.Email})";
+                TempData["success"] = $"Password reset successfully! for (Email:  {user.UserName})";
                 return RedirectToAction("Index");
             }
             

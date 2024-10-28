@@ -1,0 +1,13 @@
+﻿@page
+@using Microsoft.AspNetCore.Identity.UI.V4.Pages.Account.Internal
+@model LockoutModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Account locked";
+}
+
+<div class="alert alert-danger">
+    <h4 style="color:red"> Your account is locked by Admin !!!</h4>
+    <p style="color:red"> Please contact Admin to restore access.</p>
+</div>
+<a href="mailto:admin@example.com" class="btn btn-primary">Contact Admin</a>

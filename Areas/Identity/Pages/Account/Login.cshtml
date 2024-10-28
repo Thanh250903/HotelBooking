@@ -1,6 +1,5 @@
 ﻿@page
 @model LoginModel
-
 @{
     ViewData["Title"] = "Log in";
 }
@@ -24,6 +23,11 @@
                                 <label asp-for="Input.Email" class="form-label">Email</label>
                                 <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
                                 <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+                            <div class="input-box">
+                                <span class="icon">
+                                    <ion-icon name="lock-closed"></ion-icon>
+                                </span>
                             </div>
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label asp-for="Input.Password" class="form-label">Password</label>

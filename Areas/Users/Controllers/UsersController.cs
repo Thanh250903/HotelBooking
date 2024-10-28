@@ -7,11 +7,11 @@ namespace HotelApp.Areas.User.Controllers
     // User sẽ có ProfileController: Cho phép người dùng chỉnh sửa thông tin cá nhân, cập nhật profile của họ => Method: ViewProfile, EditProfile, ChangePassword, UploadProfilePicture, DeleteProfile
     // User sẽ có PaymenController: Cho phép người dùng thanh toán phòng, chuyến đi => Method: MakePayment, ViewPaymentHistory, ViewPaymentDetail
     // User sẽ có AddToCartController: Cho phép người dùng bấm vào giỏ hàng để xem khách sạn, chuyến đi nào mình đã thích => Method: AddToCart, ViewCart, RemoveFromCart, ClearCart
-    public class UsersController : Controller
-    {
-        public IActionResult Index()
-        {
-            return View();
-        }
-    }
+    //public class UsersController : Controller
+    //{
+    //    public IActionResult Index()
+    //    {
+    //        return View();
+    //    }
+    //}
 }

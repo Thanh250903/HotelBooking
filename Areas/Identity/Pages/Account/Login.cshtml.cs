@@ -87,7 +87,8 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     var user = await _userManager.FindByEmailAsync(Input.Email);
                     if(await _userManager.IsInRoleAsync(user, "Admin"))
                     {
-                        return Redirect("Admin/Home/Index");
+                        return RedirectToAction("Index", "Users");
+                        //return Redirect("Admin/User/Index");
                     }
                     else if (await _userManager.IsInRoleAsync(user, "Owner"))
                     {
@@ -112,7 +113,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
+                    return RedirectToPage("/Account/Manage/Lockout");
                 }
                 else
                 {

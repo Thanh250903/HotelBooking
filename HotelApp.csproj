@@ -30,7 +30,7 @@
     <Folder Include="Areas\Owner\Views\" />
     <Folder Include="Areas\Staff\Views\" />
     <Folder Include="Areas\SystemManager\Views\" />
-    <Folder Include="Areas\User\Views\" />
+    <Folder Include="Areas\Users\Views\" />
     <Folder Include="Views\Room\" />
   </ItemGroup>
 

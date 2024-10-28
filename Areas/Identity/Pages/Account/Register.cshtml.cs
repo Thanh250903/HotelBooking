@@ -136,11 +136,6 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     UserPhoneNumber = Input.PhoneNumber,
                     Role = Input.Role,
                 };
-                //if (!Input.Email.Contains("@"))
-                //{
-                //    ModelState.AddModelError(string.Empty, "Email account must have @ character");
-                //    return Page();
-                //}
                 if (!new EmailAddressAttribute().IsValid(Input.Email))
                 {
                     ModelState.AddModelError(string.Empty, "Email is not valid.");
@@ -154,8 +149,6 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     TempData["error"] = "User with this email already exists!";
                     return Page();
                 }
-                //await _userStore.SetUserNameAsync((ApplicationUser)user, Input.Email, CancellationToken.None);
-                //await _emailStore.SetEmailAsync((ApplicationUser)user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync((ApplicationUser)user, Input.Password);
 
                 if (result.Succeeded)
@@ -166,7 +159,6 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRolesAsync(user, new[] { "User" });
                         TempData["success"] = "Create account successfully";
-                        //await _signInManager.SignInAsync(user, isPersistent: false);
                         return RedirectToAction("Index", "Home");
                     }
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)

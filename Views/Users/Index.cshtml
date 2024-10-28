@@ -2,6 +2,9 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using System.Collections
 @model IEnumerable<ApplicationUser>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
 @if (TempData["EditUserMessage"] != null && (bool)TempData["ShowMessage"])
 {
     <div id="editUserMessage" class="alert alert-warning">@TempData["EditUserMessage"]</div>
@@ -33,7 +36,7 @@ else if (TempData["DeleteUserMessage"] != null && (bool)TempData["ShowMessage"])
                 <label for="myInput">
                     <ion-icon name="search-outline" style=" transform: translateY(0);"></ion-icon>
                 </label>
-                <input id="myInput" class="form-control" type="text" placeholder="Search" style="margin-right: 30px;">
+                <input  id="myInput" class="form-control" type="text" placeholder="Search" style="margin-right: 30px;">
             </form>
         </div>
         <div class="table-responsive">
@@ -68,15 +71,18 @@ else if (TempData["DeleteUserMessage"] != null && (bool)TempData["ShowMessage"])
                             <td>
                                 <div class="btn-group mr-2" role="group" aria-label="Basic example">
                                     <a class="btn btn-primary" asp-controller="Users" asp-action="Edit" asp-route-id="@user.Id">
-                                        <i class="fa-solid fa-pen"></i> Edit
+                                        <i class="fas fa-pen"></i> Edit
                                     </a>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <a class="btn btn-secondary" asp-area="Admin" asp-controller="Users" asp-action="ResetPassword" asp-route-id="@user.Id">
-                                            <i class="fa-solid fa-key"></i> Reset Password
+                                            <i class="fas fa-key"></i> Reset Password
                                         </a>
-                                        <a class="btn btn-danger" asp-area="Admin" asp-controller="Users" asp-action="Delete" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
-                                            <i class="fa-solid fa-xmark"></i> Delete
+                                        <a class="btn btn-danger" asp-controller="Users" asp-action="Delete" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                        <a class="btn btn-warning" asp-controller="Users" asp-action="LockAccount" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
+                                            <i class="fas fa-user-lock"></i> Lock
                                         </a>
                                     }
                                 </div>
@@ -89,8 +95,6 @@ else if (TempData["DeleteUserMessage"] != null && (bool)TempData["ShowMessage"])
         </div>
     </div>
 }
-
-
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -103,4 +107,4 @@ else if (TempData["DeleteUserMessage"] != null && (bool)TempData["ShowMessage"])
             });
         });
     </script>
-}
+} 
