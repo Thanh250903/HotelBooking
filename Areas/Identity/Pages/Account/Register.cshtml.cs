@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using HotelApp.Data;
 using HotelApp.Models.Others;
 using HotelApp.Repository.IRepository;
+using HotelApp.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -106,15 +107,16 @@ namespace HotelApp.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Your Address")]
             public string Address { get; set; }
-            public IEnumerable<SelectListItem> SelectYourRole { get; set; }
+            //public IEnumerable<SelectListItem> SelectYourRole { get; set; }
             [Required]
-            public string Role { get; set; }
+            [Display(Name = "Role")]
+            public string Role { get; set; } = " User";
         }
 
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            GetRoles();
+          
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
@@ -134,7 +136,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     UserAddress = Input.Address,
                     PhoneNumber = Input.PhoneNumber,
                     UserPhoneNumber = Input.PhoneNumber,
-                    Role = Input.Role,
+                    Role = "User",
                 };
                 if (!new EmailAddressAttribute().IsValid(Input.Email))
                 {
@@ -145,7 +147,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     //_dbContext.Users.Any(x => x.Email == user.Email);
                 if (checkMailExists !=null)
                 {
-                    GetRoles();
+                  
                     TempData["error"] = "User with this email already exists!";
                     return Page();
                 }
@@ -157,9 +159,10 @@ namespace HotelApp.Areas.Identity.Pages.Account
                     // Notification
                     if (Input.Role == "User")
                     {
-                        await _userManager.AddToRolesAsync(user, new[] { "User" });
+                        //await _userManager.AddToRolesAsync(user, new[] { "User" });
+                        await _userManager.AddToRoleAsync(user, Input.Role);
                         TempData["success"] = "Create account successfully";
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToPage("/Account/Login", new { area = "Identity" });
                     }
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
@@ -178,7 +181,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
             }
 
            // If register failed
-            GetRoles();
+           
             return Page();
         }
 
@@ -192,17 +195,17 @@ namespace HotelApp.Areas.Identity.Pages.Account
 
         }
         // Get roles function
-        private void GetRoles()
-        {
-            Input = new InputModel()
-            {
-                SelectYourRole = _roleManager.Roles.Where(x => x.Name != "Admin")
-                    .Select(x => x.Name).Select(x => new SelectListItem()
-                    {
-                        Text = x,
-                        Value = x
-                    })
-            };
-        }
+        //private void GetRoles()
+        //{
+        //    Input = new InputModel()
+        //    {
+        //        SelectYourRole = _roleManager.Roles.Where(x => x.Name != "Admin")
+        //            .Select(x => x.Name).Select(x => new SelectListItem()
+        //            {
+        //                Text = x,
+        //                Value = x
+        //            })
+        //    };
+        //}
     }
 }
