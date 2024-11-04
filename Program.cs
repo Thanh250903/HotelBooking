@@ -88,8 +88,14 @@ app.UseAuthentication(); // xác thực người dùng
 app.UseAuthorization(); // phân quyền
 app.MapRazorPages();
 app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}" // xac dinh area
+);
+
+app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}" // khi kh co area dc chi dinh
+);
 
 
 app.Run();

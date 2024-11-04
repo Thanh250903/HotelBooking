@@ -2,20 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using HotelApp.Models.Others;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using HotelApp.Models.Others;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotelApp.Areas.Identity.Pages.Account
 {
@@ -84,43 +76,45 @@ namespace HotelApp.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(Input.Email);
-                    if(await _userManager.IsInRoleAsync(user, "Admin"))
+                    if (result.Succeeded)
                     {
-                        return RedirectToAction("Index", "Users");
-                        //return Redirect("Admin/User/Index");
-                    }
-                    else if (await _userManager.IsInRoleAsync(user, "Owner"))
-                    {
-                        return Redirect("Owner/Home/Index");
-                    }
-                    else if (await _userManager.IsInRoleAsync(user, "Staff"))
-                    {
-                        return Redirect("Staff/Home/Index");
-                    }
-                    else if (await _userManager.IsInRoleAsync(user, "User"))
-                    {
-                        return Redirect("/Home/Index");
-                    }
-                    return LocalRedirect(returnUrl);
-                    }
-                    if (result.RequiresTwoFactor)
-                    {
-                        _logger.LogWarning("Requires two factor authentication.");
-                        return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
-                    }
-                    if (result.IsLockedOut)
-                    {
-                        _logger.LogWarning("User account locked out.");
-                        return RedirectToPage("/Account/Manage/Lockout");
-                    }
-                        else
+                        var user = await _userManager.FindByEmailAsync(Input.Email);
+                        if (await _userManager.IsInRoleAsync(user, "Admin"))
                         {
-                            _logger.LogWarning($"Login failed for {Input.Email}. Result: {result}");
-                            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                            return Page();
+                            return RedirectToAction("Index", "Users", new { area = "Admin" });
+                        }
+                        else if (await _userManager.IsInRoleAsync(user, "Owner"))
+                        {
+                            return RedirectToAction("Index", "Home", new { area = "Owner" });
+                        }
+                        else if (await _userManager.IsInRoleAsync(user, "Staff"))
+                        {
+                            return RedirectToAction("Index", "Home", new { area = "Staff" });
+                        }
+                        else if (await _userManager.IsInRoleAsync(user, "User"))
+                        {
+                            return RedirectToAction("Index", "Home", new { area = "Users" });
                         }
                     }
+                    return LocalRedirect(returnUrl);
+                }
+                if (result.RequiresTwoFactor)
+                {
+                    _logger.LogWarning("Requires two factor authentication.");
+                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                }
+                if (result.IsLockedOut)
+                {
+                    _logger.LogWarning("User account locked out.");
+                    return RedirectToPage("/Account/Manage/Lockout");
+                }
+                else
+                {
+                    _logger.LogWarning($"Login failed for {Input.Email}. Result: {result}");
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+            }
 
             // If we got this far, something failed, redisplay form
             return Page();
