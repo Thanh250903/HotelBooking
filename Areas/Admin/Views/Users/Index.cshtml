@@ -103,7 +103,7 @@ else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["S
                                         <a class="btn btn-secondary" asp-area="Admin" asp-controller="Users" asp-action="ResetPassword" asp-route-id="@user.Id">
                                             <i class="fas fa-key"></i> Reset Password
                                         </a>
-                                        <a class="btn btn-danger" asp-area="Admin" asp-controller="Users" asp-action="Delete" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
+                                        <a class="btn btn-danger" asp-area="Admin" asp-controller="Users" asp-action="DeleteUser" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>
                                         <a class="btn btn-warning" asp-area="Admin" asp-controller="Users" asp-action="LockAccount" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
