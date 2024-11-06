@@ -8,6 +8,8 @@ using HotelApp.AutoCreateRole;
 using HotelApp.CreateDB;
 using HotelApp.Utility;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using HotelApp.Models.User;
+using HotelApp.Areas.Identity.Pages.Account;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,10 +55,12 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IHotelRepository, HotelRepository>();
 builder.Services.AddScoped<IAutoCreateRole, RoleCreater>();
-builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<SendEmail>(builder.Configuration.GetSection("SendEmail"));
+builder.Services.AddTransient<HotelApp.Utility.IEmailSender, EmailSender>();
 builder.Services.AddScoped<UserManageProfile>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddOptions();
+builder.Services.AddTransient<RegisterModel>();
 
 var app = builder.Build();
 

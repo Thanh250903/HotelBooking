@@ -2,11 +2,13 @@
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Hotel.VM;
 using HotelApp.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace HotelApp.Controllers
+namespace HotelApp.Areas.Owner.Controllers
 {
+    [Area("Owner")]
     public class RoomController : Controller
     {
         private readonly ApplicationDBContext _dbContext;
@@ -34,7 +36,7 @@ namespace HotelApp.Controllers
             //AppDomain/CreateRoom?id=23&searchTerm="ưèwè"
             // get hotel id from route
             var hotel = _unitOfWork.HotelRepository.GetById(id);
-            if(hotel == null)
+            if (hotel == null)
             {
                 return NotFound("Cannot find the hotel to create room");
             }
@@ -50,7 +52,7 @@ namespace HotelApp.Controllers
         [Route("CreateRoom")]
         public async Task<IActionResult> CreateRoom(RoomVM roomVM, IFormFile? roomImages)
         {
-            
+
             if (ModelState.IsValid)
             {
                 //Handle pictures room
@@ -99,7 +101,7 @@ namespace HotelApp.Controllers
                 }
 
                 //Check roomnumber same name
-                if(!_unitOfWork.RoomRepository.IsRoomNumberUnique(roomVM.HotelId, roomVM.RoomNumber))
+                if (!_unitOfWork.RoomRepository.IsRoomNumberUnique(roomVM.HotelId, roomVM.RoomNumber))
                 {
                     ModelState.AddModelError("", "Room number already exits for this hotel, try again!!!");
                     return View(roomVM);
@@ -148,13 +150,13 @@ namespace HotelApp.Controllers
         }
 
         [HttpPost]
-       
+
         public async Task<IActionResult> EditRoom(RoomVM roomVM, IFormFile? roomImages)
         {
             if (ModelState.IsValid)
             {
                 // Handle image update
-                if(roomImages != null && roomImages.Length > 0)
+                if (roomImages != null && roomImages.Length > 0)
                 {
                     var wwwRootPath = Path.Combine(_webHostEnvironment.WebRootPath, "img");
                     var fileName = Path.GetFileName(roomImages.FileName);
@@ -179,9 +181,9 @@ namespace HotelApp.Controllers
                     }
 
                 }
-                
+
                 var room = _unitOfWork.RoomRepository.GetById(roomVM.RoomId);
-                if(room == null)
+                if (room == null)
                 {
                     ModelState.AddModelError("", "Room not found");
                     return View(roomVM);

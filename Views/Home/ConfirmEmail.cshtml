@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Email Confirmation";
+}
+
+
+<h2>Email Confirmation</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.Message))
+{
+    <p style="color: green; font-weight: bold;">@ViewBag.Message</p>
+}
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <p style="color: red; font-weight: bold;">@ViewBag.ErrorMessage</p>
+}

@@ -22,7 +22,7 @@
 
 <div>
     <div class="col-6 text-right">
-        <a asp-controller="Hotel" asp-action="CreateHotel" class="btn btn-primary">Create a Hotel</a>
+        <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel" class="btn btn-primary">Create a Hotel</a>
     </div>
     <table class="table table-striped table-hover">
         <thead class="thead-dark">
@@ -60,13 +60,13 @@
                         }
                     </td>
                     <td>
-                        <a asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary btn-sm" onclick="return confirm('Are you sure?')">
+                        <a asp-area="Owner" asp-controller="Hotel" asp-action="EditHotel" asp-route-id="@hotel.HotelId" class="btn btn-primary btn-sm" onclick="return confirm('Are you sure?')">
                             <i class="fas fa-edit"></i> Edit
                         </a>
-                        <a asp-controller="Hotel" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
+                        <a asp-area="Owner" asp-controller="Hotel" asp-action="DeleteHotel" asp-route-id="@hotel.HotelId" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">
                             <i class="fas fa-trash-alt"></i> Delete
                         </a>
-                        <a asp-controller="Room" asp-action="CreateRoom" asp-route-id="@hotel.HotelId" class="btn btn-success btn-sm">
+                        <a asp-area="Owner" asp-controller="Room" asp-action="CreateRoom" asp-route-id="@hotel.HotelId" class="btn btn-success btn-sm">
                             <i class="fas fa-house-user"></i> Add Room
                         </a>
                     </td>

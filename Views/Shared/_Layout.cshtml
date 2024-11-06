@@ -100,31 +100,26 @@
                                         <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-item nav-link">Contact</a>
                                     </div>
                                 </div>
+                                @if (!User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-area="" asp-controller="Home" asp-action="SendConfirmationEmail" class="nav-item nav-link" style="background-color: #FFA500; color:white; padding: 10px 20px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">ĐĂNG KÝ NƠI LƯU TRÚ CỦA BẠN</a>
+                                }
                             }
                             @if (User.Identity.IsAuthenticated && User.IsInRole("Owner"))
                             {
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
-                                <div class="dropdown-menu rounded-0 m-0">
-                                    <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
-                                    <a asp-area="Owner" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
-                                    <a href="testimonial.html" class="dropdown-item">Review</a>
-                                </div>
-                              @*   <li class="nav-item">
-                                    <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel">Create hotel</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a asp-area="Owner" asp-controller="Hotel" asp-action="Index">Hotel information</a>
-                                </li>
-                                <div class="nav-item dropdown">
-                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
-                                    <div class="dropdown-menu rounded-0 m-0">
-                                        <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
-                                        <a asp-area="Owner" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
-                                        <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a>
-                                        <a href="testimonial.html" class="dropdown-item">Review</a>
+                                <div class="navbar-nav mr-auto py-0 justify-content-center">
+                                    <div class="nav-item dropdown">
+                                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">More</a>
+                                        <div class="dropdown-menu rounded-0 m-0">
+                                            <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
+                                            <a asp-area="Owner" asp-controller="Hotel" asp-action="Index" class="dropdown-item">List of Hotel</a>
+                                         @* có thể dùng để quản lý tk Staff    <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a> *@ 
+                                            <a href="testimonial.html" class="dropdown-item">Review</a>
+                                        </div>
                                     </div>
-                                </div> *@
+                                </div>
                             }
+                           
                             @if (User.IsInRole("Staff"))
                             {
                                 <li class="nav-item">
@@ -171,9 +166,7 @@
                         <partial name="_LoginPartial" />
                     </div>
                     </nav>
-               
-
-    </div>
+            </div>
             <div class="container-fluid">
                 <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
                     <!-- Carousel indicators -->
@@ -257,11 +250,6 @@
         <!-- Back to Top -->
         <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
     </div>
-
-   
-
-
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
