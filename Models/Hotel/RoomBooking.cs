@@ -11,15 +11,15 @@ namespace HotelApp.Models.Hotel
         [Key]
         public int RoomBookingId { get; set; } // mã định danh đặt phòng kh sạn
         [ValidateNever]
-        public int? RoomId { get; set; } // mã định danh của phòng được đặt
+        public int RoomId { get; set; } // mã định danh của phòng được đặt
         [ValidateNever]
         [ForeignKey("RoomId")]
         public Room Room { get; set; } // liên kết với đối tượng Room, xem phòng nào đã được đặt
-        [Required]
-        public string UserId { get; set; } // mã định danh của người đặt phòng
-        [Required]
+        public string? UserId { get; set; } // mã định danh của người đặt phòng
         [ForeignKey("UserId")]
-        public ApplicationUser User { get; set; } // liên kết với đối tượng User, xem người nào đã đặt phòng
+        public ApplicationUser? User { get; set; } // liên kết với đối tượng User, xem người nào đã đặt phòng
+        [ValidateNever]
+        public DateTime? BookingDate { get; set; }
         [ValidateNever]
         [Display(Name = "Choose checkin date")]
         public DateTime CheckInDate { get; set; } // ngày đến
@@ -29,11 +29,6 @@ namespace HotelApp.Models.Hotel
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         [ValidateNever]
         public decimal TotalPrice { get; set; }
-        //public int PaymentId { get; set; } // Null nếu kh có thanh toán
-        //[ForeignKey("PaymentId")]
-        //[ValidateNever]
-        //// Thêm navigation property từ RoomBooking đến Payment
-        //public Payment? Payment { get; set; } // Tham chiếu tới Payment nếu có thanh toán
 
     }
 }
