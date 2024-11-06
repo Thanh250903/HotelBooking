@@ -6,6 +6,8 @@ namespace HotelApp.Models.Others
 {
     public class ApplicationUser :IdentityUser
     {
+        [Required]
+        public string Name {  get; set; }
         public string UserPhoneNumber { get; set; }
         [ValidateNever]
         public string UserAddress { get; set; }
@@ -17,5 +19,7 @@ namespace HotelApp.Models.Others
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         [ValidateNever]
         public bool IsActive { get; set; } = true; // Active status
+        [ValidateNever]
+        public string? ProfilePicture {  get; set; } = "/img/user_image/default-avatar2.png"; 
     }
 }
