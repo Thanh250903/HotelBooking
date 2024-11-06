@@ -1,0 +1,17 @@
+﻿@model List<HotelApp.Models.Others.Payment>
+@if (TempData["success"] != null)
+{
+    <h1>@TempData["success"]</h1>
+}
+@if (TempData["error"] != null)
+{
+    <h1>@TempData["error"]</h1>
+}
+<h2>
+    This is page for payment 
+</h2>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
