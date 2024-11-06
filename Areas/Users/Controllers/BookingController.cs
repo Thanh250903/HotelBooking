@@ -4,13 +4,16 @@ using HotelApp.Models.Hotel.VM;
 using HotelApp.Models.Others;
 using HotelApp.Repository;
 using HotelApp.Repository.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq.Expressions;
 using static HotelApp.Models.Hotel.Room;
 
-namespace HotelApp.Controllers
+namespace HotelApp.Areas.Users.Controllers
 {
+    [Area("User")]
+    [Authorize(Roles = "User")]
     public class BookingController : Controller
     {
         private readonly ApplicationDBContext _dbContext;
@@ -25,8 +28,8 @@ namespace HotelApp.Controllers
         [HttpGet]
         public IActionResult Index(int roomId)
         {
-                List<RoomBooking> roombookings = _unitOfWork.BookingRepository.GetBookingByRoomId(roomId).ToList();
-                return View(roombookings);
+            List<RoomBooking> roombookings = _unitOfWork.BookingRepository.GetBookingByRoomId(roomId).ToList();
+            return View(roombookings);
         }
         [HttpGet]
         //Querry search room available
@@ -75,13 +78,13 @@ namespace HotelApp.Controllers
             if (ModelState.IsValid)
             {
                 var room = await _unitOfWork.RoomRepository.GetRoomById(bookingVM.RoomId);
-                
+
                 if (room == null)
                 {
                     return NotFound("Room not exists");
                 }
 
-                if(room.StatusRooms != StatusRoom.Available)
+                if (room.StatusRooms != StatusRoom.Available)
                 {
                     return NotFound("Room is not available for booking");
                 }
@@ -107,20 +110,20 @@ namespace HotelApp.Controllers
                     CheckInDate = bookingVM.CheckInDate,
                     CheckOutDate = bookingVM.CheckOutDate,
                     TotalPrice = bookingVM.TotalPrice,
-                    
+
                 };
 
                 _unitOfWork.BookingRepository.Add(roomBooking);
                 //room.StatusRooms = StatusRoom.Occupied;
                 _unitOfWork.Save();
                 TempData["success"] = "Booking a room successfully, next step to confirm";
-                
+
                 return RedirectToAction("AcceptBooking", new
                 {
                     bookingId = roomBooking.RoomBookingId
                 });
 
-        }
+            }
             else
             {
                 TempData["error"] = "Try again";
@@ -182,7 +185,7 @@ namespace HotelApp.Controllers
             return View(confirmBookingVM);
         }
 
-       
+
 
        
 

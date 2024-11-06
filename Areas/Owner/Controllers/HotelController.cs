@@ -1,31 +1,45 @@
 ﻿using HotelApp.Data;
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Hotel.VM;
+using HotelApp.Models.Others;
 using HotelApp.Repository.IRepository;
+using HotelApp.Utility;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 
 namespace HotelApp.Controllers
 {
+    [Area("Owner")]
+    /*[Authorize(Roles = "Owner")]*/ // test with Admin role, because I still not finish Owner Role
+    
     public class HotelController : Controller
     {
         private readonly IHotelRepository HotelRepository;
         private ApplicationDBContext _dbContext;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public HotelController(IHotelRepository hotelRepository, ApplicationDBContext dbContext, IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
+        private readonly UserManager <ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        public HotelController(IHotelRepository hotelRepository, ApplicationDBContext dbContext, IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             HotelRepository = hotelRepository;
             _dbContext = dbContext;
             _unitOfWork = unitOfWork;
             _webHostEnvironment = webHostEnvironment;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public IActionResult Hotellist()
         {
             List<Hotel> hotels = _unitOfWork.HotelRepository.GetAll().ToList();
             return View(hotels);
         }
 
+        [AllowAnonymous]
+        [Route("Hotel/Details/{id:int}")]
         public IActionResult Details(int id)
         {
             var hotel = _unitOfWork.HotelRepository.GetById(id);
@@ -74,9 +88,9 @@ namespace HotelApp.Controllers
             return View();
         }
         [HttpPost]
-
         public async Task<IActionResult> CreateHotel(Hotel hotel, IFormFile? imageFile)
         {
+            var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
                 // Upload image
@@ -102,6 +116,10 @@ namespace HotelApp.Controllers
                     hotel.ImageUrl = $"/img/" + fileName;
 
                 }
+                if(await _userManager.IsInRoleAsync(user, Constraintt.User) && !await _userManager.IsInRoleAsync(user, Constraintt.Owner))
+                {
+                    await _userManager.AddToRoleAsync(user, Constraintt.Owner);
+                }
                 _unitOfWork.HotelRepository.Add(hotel);
                 _unitOfWork.Save();
                 TempData["success"] = "Hotel created successfully";
@@ -126,7 +144,7 @@ namespace HotelApp.Controllers
         }
 
         [HttpPost]
-
+        [Authorize(Roles = "Admin, Owner")]
         public IActionResult EditHotel(Hotel hotel, IFormFile? imageFile)
         {
             if (ModelState.IsValid)
@@ -166,7 +184,7 @@ namespace HotelApp.Controllers
             return View(hotel);
         }
         [HttpPost]
-
+        [Authorize(Roles = "Admin, Owner")]
         public IActionResult DeleteHotel(Hotel hotel)
         {
             _unitOfWork.HotelRepository.Delete(hotel);

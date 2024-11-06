@@ -1,0 +1,35 @@
+﻿@model List<HotelApp.Models.Hotel.Hotel>
+
+<partial name="_Notification" />
+
+<div class="row pt-4 pb-4">
+    <div class="col-6">
+        <h2 style="text-align:center">Danh sách Khách sạn</h2>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        @foreach (var hotel in Model)
+        {
+            <div class="col-md-3 col-sm-6 mb-4">
+                <div class="card">
+                    <a asp-controller="Hotel" asp-action="Details" asp-route-id="@hotel.HotelId">
+                        @if (!string.IsNullOrEmpty(hotel.ImageUrl))
+                        {
+                            <img src="@hotel.ImageUrl" class="card-img-top" alt="hotel_image" style="height: 300px; height:400px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <img src="/path/to/placeholder-image.jpg" class="card-img-top" alt="Không có hình ảnh" style="height: 300px; height:400px; object-fit: cover;" />
+                        }
+                    </a>
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@hotel.HotelName</h5>
+                        <p class="card-text">@hotel.City</p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

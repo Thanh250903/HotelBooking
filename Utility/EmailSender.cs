@@ -1,32 +1,44 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Net;
+using Microsoft.Extensions.Options;
+using HotelApp.Models.User;
 
 namespace HotelApp.Utility
 {
     public class EmailSender : IEmailSender
     {
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        private readonly SendEmail _emailSettings;
+
+        public EmailSender(IOptions<SendEmail> emailSettings)
         {
-            var smtpClient = new SmtpClient("smtp.example.com") // Thay bằng máy chủ SMTP thực tế
+            _emailSettings = emailSettings.Value;
+        }
+
+        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        {
+            if (string.IsNullOrEmpty(email))
             {
-                Port = 587, // Cổng SMTP (thường là 587 cho SSL)
-                Credentials = new NetworkCredential("your_email@example.com", "your_password"), // Thay bằng thông tin email thực tế
-                EnableSsl = true,
+                throw new ArgumentNullException(nameof(email), "Email address cannot be null or empty");
+            }
+
+            var client = new SmtpClient(_emailSettings.SmtpServer, _emailSettings.SmtpPort)
+            {
+                Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword),
+                EnableSsl = true
             };
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress("your_email@example.com"), // Địa chỉ email người gửi
+                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
                 Subject = subject,
-                Body = htmlMessage,
-                IsBodyHtml = true, // Đặt là true nếu bạn gửi HTML
+                Body = $"<p href='https://localhost:7257/Home/ConfirmEmail?email={email}'>{htmlMessage}</p>",
+                IsBodyHtml = true
             };
 
-            mailMessage.To.Add(email); // Thêm địa chỉ email người nhận
+            mailMessage.To.Add(email);
 
-            return smtpClient.SendMailAsync(mailMessage);
+            await client.SendMailAsync(mailMessage);
         }
     }
 }
+       

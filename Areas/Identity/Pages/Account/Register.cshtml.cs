@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using HotelApp.Controllers;
 using HotelApp.Data;
 using HotelApp.Models.Others;
 using HotelApp.Repository.IRepository;
@@ -34,9 +35,17 @@ namespace HotelApp.Areas.Identity.Pages.Account
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly Utility.IEmailSender _emailSender;
         private readonly ApplicationDBContext _dbContext;
         private readonly IUnitOfWork _unitOfWork;
+        private UserManager<ApplicationUser> userManager;
+        private object value1;
+        private SignInManager<ApplicationUser> signInManager;
+        private ILogger<HomeController> logger;
+        private object roleManager;
+        private Utility.IEmailSender emailSender;
+        private object value2;
+        private object value3;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
@@ -44,7 +53,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
             RoleManager<IdentityRole> roleManager,
-            IEmailSender emailSender,
+            Utility.IEmailSender emailSender,
             IUnitOfWork unitOfWork,
             ApplicationDBContext dbContext)
 
@@ -107,7 +116,6 @@ namespace HotelApp.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "Your Address")]
             public string Address { get; set; }
-            //public IEnumerable<SelectListItem> SelectYourRole { get; set; }
             [Required]
             [Display(Name = "Role")]
             public string Role { get; set; } = " User";
@@ -123,67 +131,135 @@ namespace HotelApp.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+            if (Request.Form["registerType"] == "User")
             {
-                var user = new ApplicationUser()
+                returnUrl ??= Url.Content("~/");
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+                if (ModelState.IsValid)
                 {
-                    UserName = Input.Email,
-                    Email = Input.Email,
-                    Name = Input.Name,
-                    EmailConfirmed = true,
-                    UserAddress = Input.Address,
-                    PhoneNumber = Input.PhoneNumber,
-                    UserPhoneNumber = Input.PhoneNumber,
-                    Role = "User",
-                };
-                if (!new EmailAddressAttribute().IsValid(Input.Email))
-                {
-                    ModelState.AddModelError(string.Empty, "Email is not valid.");
-                    return Page();
-                }
-                var checkMailExists = await _userManager.FindByEmailAsync(user.Email);
+                    var user = new ApplicationUser()
+                    {
+                        UserName = Input.Email,
+                        Email = Input.Email,
+                        Name = Input.Name,
+                        EmailConfirmed = true,
+                        UserAddress = Input.Address,
+                        PhoneNumber = Input.PhoneNumber,
+                        UserPhoneNumber = Input.PhoneNumber,
+                        Role = "User",
+                    };
+                    if (!new EmailAddressAttribute().IsValid(Input.Email))
+                    {
+                        ModelState.AddModelError(string.Empty, "Email is not valid.");
+                        return Page();
+                    }
+                    var checkMailExists = await _userManager.FindByEmailAsync(user.Email);
                     //_dbContext.Users.Any(x => x.Email == user.Email);
-                if (checkMailExists !=null)
-                {
-                  
-                    TempData["error"] = "User with this email already exists!";
-                    return Page();
-                }
-                var result = await _userManager.CreateAsync((ApplicationUser)user, Input.Password);
+                    if (checkMailExists != null && checkMailExists.Role == "User") 
+                    {
+                        TempData["error"] = "User with this email already exists!";
+                        return Page();
+                    }
+                    var result = await _userManager.CreateAsync((ApplicationUser)user, Input.Password);
 
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("Create account success");
-                    // Notification
-                    if (Input.Role == "User")
+                    if (result.Succeeded)
                     {
-                        //await _userManager.AddToRolesAsync(user, new[] { "User" });
-                        await _userManager.AddToRoleAsync(user, Input.Role);
-                        TempData["success"] = "Create account successfully";
-                        return RedirectToPage("/Account/Login", new { area = "Identity" });
+                        _logger.LogInformation("Create account success");
+                        // Notification
+                        if (Input.Role == "User")
+                        {
+                            //await _userManager.AddToRolesAsync(user, new[] { "User" });
+                            await _userManager.AddToRoleAsync(user, Input.Role);
+                            TempData["success"] = "Create account successfully";
+                            return RedirectToPage("/Account/Login", new { area = "Identity" });
+                        }
+                        if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                        {
+                            return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                        }
+                        else
+                        {
+                            await _signInManager.SignInAsync((ApplicationUser)user, isPersistent: false);
+                            return LocalRedirect(returnUrl);
+                        }
                     }
-                    if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                    foreach (var error in result.Errors)
                     {
-                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
-                    }
-                    else
-                    {
-                        await _signInManager.SignInAsync((ApplicationUser)user, isPersistent: false);
-                        return LocalRedirect(returnUrl);
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+
+                // If register failed
             }
 
-           // If register failed
-           
             return Page();
         }
+
+        public async Task<IActionResult> OnPostOwnerAsync(string returnUrl = null)
+        {
+            returnUrl ??= Url.Content("~/");
+            if (Request.Form["registerType"] == "Owner")
+            {   
+                Input.Role = "Owner";
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+                if (ModelState.IsValid)
+                {
+                    var owner = new ApplicationUser()
+                    {
+                        UserName = Input.Email,
+                        Email = Input.Email,
+                        EmailConfirmed = true,
+                        Name = Input.Name,
+                        UserAddress = Input.Address,
+                        PhoneNumber = Input.PhoneNumber,
+                        Role = "Owner",
+                    };
+
+                    if (!new EmailAddressAttribute().IsValid(Input.Email))
+                    {
+                        ModelState.AddModelError(string.Empty, "Email is not valid");
+                        return Page();
+                    }
+
+                    var checkMailExistsOrNot = await _userManager.FindByEmailAsync(owner.Email);
+                    if (checkMailExistsOrNot != null)
+                    {
+                        TempData["error"] = $"Owner with email already exists: {Input.Email} ";
+                        return Page();
+                    }
+
+                    var results = await _userManager.CreateAsync(owner, Input.Password);
+                    if (results.Succeeded)
+                    {
+                        await _userManager.AddToRoleAsync(owner, Input.Role);
+
+                        var token = await _userManager.GenerateEmailConfirmationTokenAsync(owner);
+                        var confirmationLink = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { token, email = owner.Email },
+                            protocol: Request.Scheme);
+                        var message = $"<p>Please confirm your email by clicking the button below:</p><a href='{confirmationLink}' style='background-color: #4CAF50; color: white; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border: none; border-radius: 15px;'>Confirm Email</a>";
+
+                        await _emailSender.SendEmailAsync(owner.Email, "Email Confirmation", message);
+
+                        TempData["success"] = "Owner account created successfully. Please check your email to confirm your account.";
+                        return RedirectToPage("/Account/Login", new { area = "Identity" });
+                    }
+
+                    foreach (var error in results.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
+            }
+            // If registration failed
+            return Page();
+        }
+
+
+
 
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
@@ -191,21 +267,8 @@ namespace HotelApp.Areas.Identity.Pages.Account
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<ApplicationUser>)_userStore;
+            return (IUserEmailStore<ApplicationUser>) _userStore;
 
         }
-        // Get roles function
-        //private void GetRoles()
-        //{
-        //    Input = new InputModel()
-        //    {
-        //        SelectYourRole = _roleManager.Roles.Where(x => x.Name != "Admin")
-        //            .Select(x => x.Name).Select(x => new SelectListItem()
-        //            {
-        //                Text = x,
-        //                Value = x
-        //            })
-        //    };
-        //}
     }
 }
