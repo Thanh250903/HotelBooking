@@ -48,14 +48,19 @@ namespace HotelApp.Repository
         {
           return await _dbContext.Hotels.Where(o => o.OwnerId == ownerId).ToListAsync();
         }
-        public async Task<bool> IsHotelOwnerAsync(int hotelId,  string ownerId)
+        public async Task<bool> IsHotelOwnerAsync(int id, string ownerId) 
         {
-            return await _dbContext.Hotels.AnyAsync(h => h.HotelId == hotelId  && h.OwnerId == ownerId);
+            return await _dbContext.Hotels.AnyAsync(h => h.HotelId == id && h.OwnerId == ownerId);
         }
 
-        public async Task<Hotel> GetHotelById(int hotelId)
+        public async Task<Hotel> GetHotelByIdAsync(int hotelId)
         {
             return await _dbContext.Hotels.FindAsync(hotelId);
+        }
+
+        public async Task<IEnumerable<Hotel>> GetAllHotelAsync()
+        {
+          return await _dbContext.Hotels.ToListAsync();
         }
     }
  }
