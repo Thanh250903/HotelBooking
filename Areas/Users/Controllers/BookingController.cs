@@ -46,7 +46,7 @@ namespace HotelApp.Areas.Users.Controllers
         [HttpGet]
         public async Task<IActionResult> BookingRoom(int id)
         {
-            var room = await _unitOfWork.RoomRepository.GetRoomById(id);
+            var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(id);
 
             if (room == null)
             {
@@ -77,7 +77,7 @@ namespace HotelApp.Areas.Users.Controllers
         {
             if (ModelState.IsValid)
             {
-                var room = await _unitOfWork.RoomRepository.GetRoomById(bookingVM.RoomId);
+                var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(bookingVM.RoomId);
 
                 if (room == null)
                 {
