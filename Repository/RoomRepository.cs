@@ -21,7 +21,7 @@ namespace HotelApp.Repository
         public Room GetById(int id)
         {
             return _dbContext.Rooms.Include(room => room.Hotel)
-                             .FirstOrDefault(room => room.RoomId == id);
+                             .FirstOrDefault(room => room.RoomId == id); 
         }
         // querry room by id
         // lấy ds phòng của một khách sạn cụ thể
@@ -45,12 +45,43 @@ namespace HotelApp.Repository
         
         public bool IsRoomNumberUnique(int hotelId, int roomNumber)
         {
-            return !_dbContext.Rooms.Any(r => r.HotelId == hotelId && r.RoomNumber == roomNumber);
+            return !_dbContext.Rooms.Any(r => r.HotelId == hotelId && r.RoomNumber == roomNumber); // not use
         }
 
         public async Task<Room> GetRoomById(int roomId)
         {
             return await _dbContext.Rooms.FindAsync(roomId);
         }
+
+        public async Task AddRoom(Room room)
+        {
+           await _dbContext.Rooms.AddAsync(room);
+        }
+
+        public async Task<bool> IsRoomNumberUniqueAsync(int hotelId, int roomNumber)
+        {
+           return !await _dbContext.Rooms.AnyAsync(room => room.HotelId == hotelId && room.RoomNumber == roomNumber);
+        }
+
+        public async Task<IEnumerable<Room>> GetRoomsByHotelIdAsync(int hotelId)
+        {
+            return await _dbContext.Rooms.Where(room => room.HotelId == hotelId).ToListAsync();
+        }
+
+        public async Task SaveAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Room> GetRoomByIdAsync(int id)
+        {
+            return await _dbContext.Rooms.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<Room>> GetAllRoomAsync()
+        {
+           return await _dbContext.Rooms.ToListAsync();
+        }
     }
 }
+
