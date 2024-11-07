@@ -8,6 +8,8 @@ namespace HotelApp.Repository.IRepository
 	{
         Hotel GetById(int id);
         void Update(Hotel entity);
-
+		Task<IEnumerable<Hotel>> GetHotelByOwnerId(string ownerId);
+		Task<bool> IsHotelOwnerAsync(int hotelId, string ownerId);
+		Task<Hotel> GetHotelById(int hotelId);
 	}
 }
