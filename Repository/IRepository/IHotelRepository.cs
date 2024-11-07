@@ -6,10 +6,12 @@ namespace HotelApp.Repository.IRepository
 {
 	public interface IHotelRepository : IRepository<Hotel>
 	{
-        Hotel GetById(int id);
+        Hotel GetById(int id); // not use
         void Update(Hotel entity);
 		Task<IEnumerable<Hotel>> GetHotelByOwnerId(string ownerId);
-		Task<bool> IsHotelOwnerAsync(int hotelId, string ownerId);
-		Task<Hotel> GetHotelById(int hotelId);
-	}
+		Task<Hotel> GetHotelByIdAsync(int hotelId);
+		Task<IEnumerable<Hotel>> GetAllHotelAsync();
+        Task<bool> IsHotelOwnerAsync(int id, string ownerId);
+
+    }
 }

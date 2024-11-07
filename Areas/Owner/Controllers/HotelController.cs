@@ -31,9 +31,9 @@ namespace HotelApp.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Index()
+        public async Task< IActionResult> Index()
         {
-            List<Hotel> hotels = _dbContext.Hotels.ToList();
+            var hotels = await _unitOfWork.HotelRepository.GetAllHotelAsync();
             return View(hotels);
         }
         public async Task <IActionResult> Hotellist()
@@ -150,7 +150,7 @@ namespace HotelApp.Controllers
             {
                 return Unauthorized();
             }
-            var hotel = await _unitOfWork.HotelRepository.GetHotelById(id.Value);
+            var hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
                 NotFound();
@@ -201,7 +201,7 @@ namespace HotelApp.Controllers
             {
                 return NotFound();
             }
-            hotel = await _unitOfWork.HotelRepository.GetHotelById(id.Value);
+            hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
                 return NotFound();  
