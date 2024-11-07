@@ -4,7 +4,15 @@
     ViewData["Title"] = "Profile";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
+@if (TempData["success"] != null)
+{
+    <div class="error-message" style="color: green; font-weight: bold; margin-top: 10px;"> @TempData["error"] </div>
+}
 
+@if (TempData["error"] != null)
+{
+    <div class="error-message" style="color: red; font-weight: bold; margin-top: 10px;"> @TempData["error"] </div>
+}
 <h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">

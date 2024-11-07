@@ -101,29 +101,30 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
-            if(profilePicture != null && profilePicture.Length > 0)
+
+            if (profilePicture != null && profilePicture.Length > 0)
             {
                 string wwwRootPath = _webHostEnvironment.WebRootPath;
                 var path = Path.Combine(wwwRootPath, "img", "user_image");
-                //if (!string.IsNullOrEmpty(user.ProfilePicture))
-                //{
-                //    var oldImagePath = Path.Combine(wwwRootPath, user.ProfilePicture.TrimStart('/'));
-                //    if (System.IO.File.Exists(oldImagePath))
-                //    {
-                //        System.IO.File.Delete(oldImagePath); // Xóa ảnh cũ
-                //    }
-                //}
+
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(profilePicture.FileName);
                 var filePath = Path.Combine(path, fileName);
+
+                if (profilePicture.FileName == Path.GetFileName(user.ProfilePicture))
+                {   
+                    return RedirectToAction("Index", "Hotel", new { Area = "Owner" });
+                }
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await profilePicture.CopyToAsync(stream);
                 }
+
                 user.ProfilePicture = "/img/user_image/" + fileName;
                 await _userManager.UpdateAsync(user);
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Hotel", new { Area = "Owner" });
             }
+
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
@@ -136,14 +137,14 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
                 if (!setPhoneResult.Succeeded)
                 {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
+                    TempData["error"] = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
             }
 
             await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            TempData["success"] = "Your profile updated successfully";
+            return RedirectToAction("Index", "Hotel", new { Area = "Owner" });
         }
     }
 }
