@@ -32,6 +32,11 @@ namespace HotelApp.Controllers
             _roleManager = roleManager;
         }
 
+        public IActionResult Index()
+        {
+            List<Hotel> hotels = _dbContext.Hotels.ToList();
+            return View(hotels);
+        }
         public IActionResult Hotellist()
         {
             List<Hotel> hotels = _unitOfWork.HotelRepository.GetAll().ToList();
