@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using HotelApp.Data;
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Others;
 using Microsoft.AspNetCore.Identity;
@@ -20,16 +21,19 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ApplicationDBContext _dbContext;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            ApplicationDBContext dBContext)
 
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _webHostEnvironment = webHostEnvironment;
+            _dbContext = dBContext;
         }
 
         /// <summary>
@@ -67,18 +71,23 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            [Display(Name = "FullName")]
+            public string Name { get; set; }
+            [Display(Name = "Address")]
+            public string UserAddress { get; set; }
+           
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync((ApplicationUser)user);
-            var phoneNumber = await _userManager.GetPhoneNumberAsync((ApplicationUser)user);
-
             Username = userName;
 
-            Input = new InputModel
+            Input = new InputModel 
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = user.PhoneNumber,
+                UserAddress = user.UserAddress,
+                Name = user.Name,
             };
         }
 
@@ -128,20 +137,14 @@ namespace HotelApp.Areas.Identity.Pages.Account.Manage
             if (!ModelState.IsValid)
             {
                 await LoadAsync(user);
+                TempData["error"] = "Your profile updated failed, try again";
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
-            {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    TempData["error"] = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
-
+            user.UserAddress = Input.UserAddress;
+            user.Name = Input.Name;
+            user.PhoneNumber = Input.PhoneNumber;
+            await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             TempData["success"] = "Your profile updated successfully";
             return RedirectToAction("Index", "Hotel", new { Area = "Owner" });
