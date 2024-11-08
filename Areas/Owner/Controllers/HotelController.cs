@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
 namespace HotelApp.Controllers
 {
     [Area("Owner")]
-    /*[Authorize(Roles = "Owner")]*/ // test with Admin role, because I still not finish Owner Role
-    
     public class HotelController : Controller
     {
         private readonly IHotelRepository HotelRepository;
@@ -32,25 +31,36 @@ namespace HotelApp.Controllers
             _roleManager = roleManager;
         }
 
-        public IActionResult Hotellist()
+        public async Task< IActionResult> Index()
         {
-            List<Hotel> hotels = _unitOfWork.HotelRepository.GetAll().ToList();
+            var hotels = await _unitOfWork.HotelRepository.GetAllHotelAsync();
+            return View(hotels);
+        }
+        public async Task <IActionResult> Hotellist()
+        {
+            var ownerId = _userManager.GetUserId(User);
+            var hotels = await _unitOfWork.HotelRepository.GetHotelByOwnerId(ownerId);
             return View(hotels);
         }
 
         [AllowAnonymous]
         [Route("Hotel/Details/{id:int}")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var hotel = _unitOfWork.HotelRepository.GetById(id);
-
+            var hotelList = _unitOfWork.HotelRepository.GetHotelByIdAsync(id);
+            var hotel = await hotelList;
             if (hotel == null)
             {
                 return NotFound();
             }
 
-            //take room list 
-            var rooms = _unitOfWork.RoomRepository.GetRoomsByHotelId(id).Select(room => new RoomVM
+            var ownerId = _userManager.GetUserId(User);
+            var isUser = User.IsInRole("User");
+            var isOwner = hotel.OwnerId == ownerId;// checking this Owner this hotel or not
+            var isNotOwner = !isOwner && User.IsInRole("Owner");
+
+            var rooms = await _unitOfWork.RoomRepository.GetRoomsByHotelIdAsync(id);
+            var roomVM = rooms.Select(room => new RoomVM
             {
                 RoomId = room.RoomId,
                 HotelId = room.HotelId,
@@ -59,30 +69,20 @@ namespace HotelApp.Controllers
                 Price = room.Price,
                 StatusRoom = room.StatusRooms,
                 BedCount = room.BedCount,
-                RoomImgUrl = room.RoomImgUrl
-            }).ToList();
+                RoomImgUrl = room.RoomImgUrl,
+                IsOwner = isOwner,
+            }).ToList();   //take room list 
 
             // Solve data
-            ViewBag.Hotels = hotel;
+            var hotels = new List<Hotel> { hotel };
+            ViewBag.Hotels = hotels;
+            ViewBag.IsUser = isUser;
+            ViewBag.IsOwner = isOwner;
+            ViewBag.IsNotOwner = isNotOwner;
 
-            return View(rooms); // Match model in View
-
-            // Trả về 
-            // 1 - thông tin hotel
-            // 2 - List rooms
-
-            // View
-            // Trả về 1 trong 2
-            // ViewBag
-
-            // Cách trả kết quả ra view
-            // Nếu trả hotel bằng cách return và list rooms bằng viewBag
-            // => (View) mode là hotel, viewBag là list rooms
-
-            // View => show hotel và list room
-            // Model: List room
-            // ViewBag: Hotel
+            return View(roomVM);
         }
+        [HttpGet]
         public IActionResult CreateHotel()
         {
             return View();
@@ -91,6 +91,7 @@ namespace HotelApp.Controllers
         public async Task<IActionResult> CreateHotel(Hotel hotel, IFormFile? imageFile)
         {
             var user = await _userManager.GetUserAsync(User);
+            var ownerId = _userManager.GetUserId(User);
             if (ModelState.IsValid)
             {
                 // Upload image
@@ -114,8 +115,9 @@ namespace HotelApp.Controllers
                         await imageFile.CopyToAsync(fileStream);
                     }
                     hotel.ImageUrl = $"/img/" + fileName;
-
                 }
+
+                hotel.OwnerId = ownerId;
                 if(await _userManager.IsInRoleAsync(user, Constraintt.User) && !await _userManager.IsInRoleAsync(user, Constraintt.Owner))
                 {
                     await _userManager.AddToRoleAsync(user, Constraintt.Owner);
@@ -124,18 +126,25 @@ namespace HotelApp.Controllers
                 _unitOfWork.Save();
                 TempData["success"] = "Hotel created successfully";
                 TempData["ShowMessage"] = true;
-                return RedirectToAction("Index");
+                return RedirectToAction("HotelList");
             }
             return View();
         }
 
-        public IActionResult EditHotel(int? id)
+        [HttpGet]
+        public async Task<IActionResult> EditHotel(int? id)
         {
+            
             if (id == null || id == 0)
             {
-                return NotFound();
+               return NotFound();
             }
-            Hotel? hotel = _unitOfWork.HotelRepository.Get(h => h.HotelId == id);
+            var ownerId = _userManager.GetUserId(User);
+            if (!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(id.Value, ownerId))
+            {
+                return Unauthorized();
+            }
+            var hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
                 NotFound();
@@ -144,9 +153,18 @@ namespace HotelApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, Owner")]
-        public IActionResult EditHotel(Hotel hotel, IFormFile? imageFile)
+        [Authorize(Roles = "Owner")]
+        public async Task<IActionResult> EditHotel(Hotel hotel, IFormFile? imageFile, int hotelId)
         {
+            if(hotelId != hotel.HotelId)
+            {
+                return NotFound();
+            }
+            var ownerId = _userManager.GetUserId(User);
+            if (!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(hotelId, ownerId))
+            {
+                return Unauthorized();
+            }
             if (ModelState.IsValid)
             {
                 if (imageFile != null && imageFile.Length > 0)
@@ -164,34 +182,46 @@ namespace HotelApp.Controllers
                 _unitOfWork.HotelRepository.Update(hotel);
                 _unitOfWork.Save();
                 TempData["success"] = "Hotel Updated successfully";
-                return RedirectToAction("Index");
+                return RedirectToAction("HotelList");
             }
             return View(hotel);
         }
+
         [HttpGet]
-        public IActionResult DeleteHotel(int? id)
+        public async Task<IActionResult> DeleteHotel(int? id)
         {
             Hotel hotel = new Hotel();
             if (id == 0 || id == null)
             {
                 return NotFound();
             }
-            hotel = _unitOfWork.HotelRepository.Get(h => h.HotelId == id);
+            hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
-                return NotFound();
+                return NotFound();  
+            }
+            var ownerId = _userManager.GetUserId(User);
+            if (!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(id.Value, ownerId))
+            {
+                return Unauthorized();
             }
             return View(hotel);
         }
+
         [HttpPost]
-        [Authorize(Roles = "Admin, Owner")]
-        public IActionResult DeleteHotel(Hotel hotel)
+        public async Task<IActionResult> DeleteHotel(Hotel hotel)
         {
+            var ownerId = _userManager.GetUserId(User);
+            if(!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(hotel.HotelId, ownerId)) 
+            {
+                return Unauthorized();
+            }
+
             _unitOfWork.HotelRepository.Delete(hotel);
             _unitOfWork.Save();
             TempData["success"] = "Hotel deleted successfully";
             TempData["ShowMessage"] = true;
-            return RedirectToAction("Index");
+            return RedirectToAction("HotelList");
         }
     }
 }

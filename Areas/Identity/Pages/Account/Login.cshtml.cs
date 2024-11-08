@@ -85,7 +85,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                         }
                         else if (await _userManager.IsInRoleAsync(user, "Owner"))
                         {
-                            return RedirectToAction("HotelList", "Hotel", new { area = "Owner" });
+                            return RedirectToAction("Index", "Hotel", new { area = "Owner" });
                         }
                         else if (await _userManager.IsInRoleAsync(user, "Staff"))
                         {
