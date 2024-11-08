@@ -32,5 +32,6 @@ namespace HotelApp.Models.Hotel.VM
             get { return _roomImgUrl; }
             set { _roomImgUrl = value; }
         }
+        public bool IsOwner { get; set; } // confrim Owner belong this hotel or not
     }
 }
