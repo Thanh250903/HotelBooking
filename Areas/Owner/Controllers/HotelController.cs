@@ -45,17 +45,22 @@ namespace HotelApp.Controllers
 
         [AllowAnonymous]
         [Route("Hotel/Details/{id:int}")]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var hotel = _unitOfWork.HotelRepository.GetById(id);
-
+            var hotelList = _unitOfWork.HotelRepository.GetHotelByIdAsync(id);
+            var hotel = await hotelList;
             if (hotel == null)
             {
                 return NotFound();
             }
 
-            //take room list 
-            var rooms = _unitOfWork.RoomRepository.GetRoomsByHotelId(id).Select(room => new RoomVM
+            var ownerId = _userManager.GetUserId(User);
+            var isUser = User.IsInRole("User");
+            var isOwner = hotel.OwnerId == ownerId;// checking this Owner this hotel or not
+            var isNotOwner = !isOwner && User.IsInRole("Owner");
+
+            var rooms = await _unitOfWork.RoomRepository.GetRoomsByHotelIdAsync(id);
+            var roomVM = rooms.Select(room => new RoomVM
             {
                 RoomId = room.RoomId,
                 HotelId = room.HotelId,
@@ -64,29 +69,18 @@ namespace HotelApp.Controllers
                 Price = room.Price,
                 StatusRoom = room.StatusRooms,
                 BedCount = room.BedCount,
-                RoomImgUrl = room.RoomImgUrl
-            }).ToList();
+                RoomImgUrl = room.RoomImgUrl,
+                IsOwner = isOwner,
+            }).ToList();   //take room list 
 
             // Solve data
-            ViewBag.Hotels = hotel;
+            var hotels = new List<Hotel> { hotel };
+            ViewBag.Hotels = hotels;
+            ViewBag.IsUser = isUser;
+            ViewBag.IsOwner = isOwner;
+            ViewBag.IsNotOwner = isNotOwner;
 
-            return View(rooms); // Match model in View
-
-            // Trả về 
-            // 1 - thông tin hotel
-            // 2 - List rooms
-
-            // View
-            // Trả về 1 trong 2
-            // ViewBag
-
-            // Cách trả kết quả ra view
-            // Nếu trả hotel bằng cách return và list rooms bằng viewBag
-            // => (View) mode là hotel, viewBag là list rooms
-
-            // View => show hotel và list room
-            // Model: List room
-            // ViewBag: Hotel
+            return View(roomVM);
         }
         [HttpGet]
         public IActionResult CreateHotel()
