@@ -14,6 +14,10 @@ namespace HotelApp.Utility
         public async Task<string> GetUserPictureAsync(System.Security.Claims.ClaimsPrincipal user)
         {
             var currentImage = await _userManager.GetUserAsync(user);
+            if (!string.IsNullOrEmpty(currentImage?.ProfilePicture)) 
+            {
+                return currentImage.ProfilePicture; 
+            }
             return currentImage?.ProfilePicture ?? "img/user_image/default-avatar2.jpg";
         }
     }

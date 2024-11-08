@@ -1,5 +1,13 @@
 ﻿@using System.Globalization
+@using HotelApp.Models.Hotel
 @model ICollection<HotelApp.Models.Hotel.VM.RoomVM>
+
+@{
+    var hotel = ((List<Hotel>)ViewBag.Hotels).FirstOrDefault();
+    var isUser = ViewBag.IsUser;
+    var isOwner = ViewBag.IsOwner; 
+    var isNotOwner = ViewBag.IsNotOwner;
+}
 
 @if (TempData["success"] != null)
 {
@@ -16,15 +24,15 @@
 }
 
 <div class="mb-3">
-    <h2>@ViewBag.Hotels.HotelName</h2>
+    <h2>@hotel?.HotelName</h2>
 </div>
 <div class="mb-3">
-    <p>@ViewBag.Hotels.City</p>
+    <p>@hotel?.City</p>
 </div>
-@if (!string.IsNullOrEmpty(@ViewBag.Hotels.ImageUrl))
+@if (!string.IsNullOrEmpty(@hotel?.ImageUrl))
 {
     <div class="mb-3">
-        <img src="@ViewBag.Hotels.ImageUrl" alt="Hình ảnh Khách Sạn"
+        <img src="@hotel?.ImageUrl" alt="Hình ảnh Khách Sạn"
              style="height: 300px; object-fit: cover; cursor: zoom-in;"
              onclick="openModal(this)" />
 
@@ -54,7 +62,7 @@
 }
 <div class="row pt-4 pb-4">
     <div class="col-6">
-        <h2 style="text-transform:uppercase"> List of Room in @ViewBag.Hotels.HotelName</h2>
+        <h2 style="text-transform:uppercase"> List of Room in @hotel?.HotelName</h2>
     </div>
 </div>
 
@@ -83,7 +91,7 @@
                     <td>
                         @if (!string.IsNullOrEmpty(room.RoomImgUrl))
                         {
-                                <img src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover" />
+                                <img src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover; margin:0 auto; display:block" />
                         }
                         else
                         {
@@ -93,18 +101,35 @@
                         }
                     </td>
                     <td>
-                        <a asp-area="Owner" asp-controller="Room" asp-action="EditRoom" asp-route-id="@room.RoomId" class="btn btn-primary btn-sm">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <a asp-area="Owner" asp-controller="Room" asp-action="DeleteRoom" asp-route-id="@room.RoomId" class="btn btn-danger btn-sm">
-                             <i class="fas fa-trash-alt"></i> Delete
-                        </a>
-                        <a asp-area="Users" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
+                        @if (isOwner)
+                        {
+                            <a asp-area="Owner" asp-controller="Room" asp-action="EditRoom" asp-route-id="@room.RoomId" class="btn btn-primary btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-area="Owner" asp-controller="Room" asp-action="DeleteRoom" asp-route-id="@room.RoomId" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                            <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
+                                <i class="fa fa-check-square"></i>
+                                Đặt ngay
+                            </a>
+                        }
+                        @if (isNotOwner)
+                        {
+                            <a asp-area="Users" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-undo"></i> Return
-                        </a>
-                        <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
-                            <i class="fa fa-check-square"></i>
-                            Đặt ngay</a>
+                            </a>
+                        }
+                        @if (isUser)
+                        {
+                            <a asp-area="Users" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-undo"></i> Return
+                            </a>
+                            <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
+                                <i class="fa fa-check-square"></i>
+                                Đặt ngay
+                            </a>
+                        }
                     </td>
                 </tr>
             }

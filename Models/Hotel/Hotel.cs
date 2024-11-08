@@ -39,5 +39,6 @@ namespace HotelApp.Models.Hotel
         public ICollection<Room>? Rooms { get; set; } // tùy thuộc vào tình trạng phòng để quản lý phòng dễ dàng hơn, cho phép đặt phòng trực tuyến và chọn phòng như ý muốn
         public ICollection<RoomBooking>? RoomBookings { get; set; } // set với RoomBooking
         public ICollection<HotelReview>? HotelReviews { get; set; } // danh sách về các đánh giá của khách sạn
+        public string OwnerId {  get; set; }
     }
 }

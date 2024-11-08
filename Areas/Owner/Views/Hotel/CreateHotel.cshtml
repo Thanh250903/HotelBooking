@@ -5,6 +5,7 @@
 }
 <h1 class="text-center my-4">Create a Hotel</h1>
 <form method="post" enctype="multipart/form-data" class="container">
+    <input type="hidden" asp-for="OwnerId" value="@User.Identity" />
     <div class="border p-4 rounded shadow-sm">
         <div class="mb-3 row">
             <label asp-for="HotelName" class="col-sm-2 col-form-label"></label>
@@ -64,7 +65,7 @@
                 <a asp-area="Owner" asp-controller="Hotel" asp-action="Index" class="btn btn-secondary w-100">Back to list</a>
             </div>
             <div class="col">
-                <button type="reset" class="btn btn-warning w-100">Reset all</button>
+            <button type="reset" class="btn btn-warning w-100">Reset all</button>
             </div>
     </div>
 </form>
