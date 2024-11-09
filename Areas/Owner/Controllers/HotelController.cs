@@ -128,6 +128,11 @@ namespace HotelApp.Controllers
                 TempData["ShowMessage"] = true;
                 return RedirectToAction("HotelList");
             }
+            else
+            {
+                TempData["error"] = "Create hotel failed, try again";
+                TempData["ShowMessage"] = true;
+            }
             return View();
         }
 
