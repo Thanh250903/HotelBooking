@@ -1,18 +1,22 @@
 ﻿@using System.Globalization
 @using HotelApp.Models.Hotel
-@model ICollection<HotelApp.Models.Hotel.VM.RoomVM>
+@using HotelApp.Models.Others
+@using Microsoft.AspNetCore.Identity
+@model HotelApp.Models.Hotel.VM.HotelDetailsVM
 
 @{
-    var hotel = ((List<Hotel>)ViewBag.Hotels).FirstOrDefault();
     var isUser = ViewBag.IsUser;
-    var isOwner = ViewBag.IsOwner; 
+    var isOwner = ViewBag.IsOwner;
     var isNotOwner = ViewBag.IsNotOwner;
+    var reviews = ViewBag.Reviews;
+    var newReview = (HotelReview)ViewBag.NewReview;
+    var userManager = (UserManager<ApplicationUser>)ViewBag.UserManager;
 }
 
 @if (TempData["success"] != null)
 {
     <div class="alert alert-success">
-        @TempData["success"]
+        @TempData["success"]    
     </div>
 }
 
@@ -23,46 +27,159 @@
     </div>
 }
 
-<div class="mb-3">
-    <h2>@hotel?.HotelName</h2>
-</div>
-<div class="mb-3">
-    <p>@hotel?.City</p>
-</div>
-@if (!string.IsNullOrEmpty(@hotel?.ImageUrl))
-{
-    <div class="mb-3">
-        <img src="@hotel?.ImageUrl" alt="Hình ảnh Khách Sạn"
-             style="height: 300px; object-fit: cover; cursor: zoom-in;"
-             onclick="openModal(this)" />
+<div class="hotel-details">
+    <div class="hotel-info">
+        <h2>@Model.HotelName</h2>
+        <p>@Model.City</p>
+        <p>@Model.Description</p>
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div class="hotel-image">
+                <img src="@Model.ImageUrl" alt="Hotel_image" style="height: 300px; object-fit: cover; cursor: zoom-in;" onclick="openModal(this)" />
 
-
-        <!-- Lightbox Modal -->
-        <div id="imageModal" style="display:none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
-            <span style="position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeModal()">&times;</span>
-            <img id="modalImage" style="margin: auto; display: block; width: 100%; height: 100%; object-fit: contain;">
-        </div>
-
-        <script>
-            function openModal(img) {
-                // Zoom in
-                var modal = document.getElementById("imageModal");
-                var modalImg = document.getElementById("modalImage");
-                modal.style.display = "block";
-                modalImg.src = img.src;
-            }
-
-            function closeModal() {
-                // Zoom out
-                var modal = document.getElementById("imageModal");
-                modal.style.display = "none";
-            }
-        </script>
+                <!-- Lightbox Modal -->
+                <div id="imageModal" style="display:none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9);">
+                    <span style="position: absolute; top: 20px; right: 35px; color: white; font-size: 40px; font-weight: bold; cursor: pointer;" onclick="closeModal()">&times;</span>
+                    <img id="modalImage" style="margin: auto; display: block; width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            </div>
+        }
     </div>
-}
+
+    <div class="hotel-reviews">
+        <h6 style="font-weight: bold">All comments from other tourists</h6>
+        <p> Total Reviews: @Model.TotalReviews</p>
+        <div id="reviewContainer" class="d-flex overflow-hidden" style="gap: 10px; width: 100%; max-width: 500px; margin: auto;">
+            @for (var i = 0; i < Model.HotelReviews.Count(); i++)
+            {
+                var review = Model.HotelReviews.ElementAt(i);
+                <div class="review-item card text-center" style="min-width: 100%; display: none; flex-shrink: 0;" id="review-@i">
+                    <div class="card-body">
+                        <p class="card-text">@review.Comment</p>
+                        @if (!string.IsNullOrEmpty(review.Image))
+                        {
+                            <img src="@review.Image" style="height: 50px; object-fit: cover; margin: 0 auto; display: block" />
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <small>Created at: @review.CreateAt.ToString("MMMM dd, yyyy") by @review.User?.UserName ?? "Anonymous"</small>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <button class="btn btn-outline-secondary" id="prevReview">Previous</button>
+            <button class="btn btn-outline-secondary" id="nextReview">Next</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const reviews = document.querySelectorAll(".review-item");
+            let currentIndex = 0;
+
+            // Display the first review initially
+            if (reviews.length > 0) {
+                reviews[0].style.display = "block";
+            }
+
+            document.getElementById("prevReview").addEventListener("click", function () {
+                reviews[currentIndex].style.display = "none";
+                currentIndex = (currentIndex - 1 + reviews.length) % reviews.length;
+                reviews[currentIndex].style.display = "block";
+            });
+
+            document.getElementById("nextReview").addEventListener("click", function () {
+                reviews[currentIndex].style.display = "none";
+                currentIndex = (currentIndex + 1) % reviews.length;
+                reviews[currentIndex].style.display = "block";
+            });
+        });
+
+        function openModal(img) {
+            var modal = document.getElementById("imageModal");
+            var modalImg = document.getElementById("modalImage");
+            modal.style.display = "block";
+            modalImg.src = img.src;
+        }
+
+        function closeModal() {
+            var modal = document.getElementById("imageModal");
+            modal.style.display = "none";
+        }
+    </script>
+
+    <style>
+        .hotel-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .hotel-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .hotel-reviews {
+            flex: 0.6;
+            min-width: 300px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+            .hotel-reviews h6 {
+                color: #343a40;
+                font-weight: bold;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+
+        .review-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .review-item:hover {
+                transform: scale(1.02);
+                box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            .review-item .card-body {
+                font-size: 14px;
+                color: #495057;
+            }
+
+        .btn-outline-secondary {
+            border-color: #6c757d;
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            padding: 8px 12px;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: #6c757d;
+                color: #ffffff;
+            }
+    </style>
+</div>
+
+
 <div class="row pt-4 pb-4">
     <div class="col-6">
-        <h2 style="text-transform:uppercase"> List of Room in @hotel?.HotelName</h2>
+        <h2 style="text-transform:uppercase"> List of Rooms in @Model.HotelName</h2>
     </div>
 </div>
 
@@ -80,67 +197,114 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var room in Model)
+            @foreach (var room in Model.Rooms)
             {
-                <tr>
-                    <td>@room.RoomNumber</td>
-                    <td>@room.RoomType</td>
-                    <td>@room.Price.ToString("C0", new CultureInfo("vi-VN"))</td> 
-                    <td>@room.StatusRoom.ToString()</td>
-                    <td>@room.BedCount</td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(room.RoomImgUrl))
-                        {
-                                <img src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover; margin:0 auto; display:block" />
-                        }
-                        else
-                        {
-                            <p>
-                               Image not availabe
-                            </p>
-                        }
-                    </td>
-                    <td>
-                        @if (isOwner)
-                        {
-                            <a asp-area="Owner" asp-controller="Room" asp-action="EditRoom" asp-route-id="@room.RoomId" class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                            <a asp-area="Owner" asp-controller="Room" asp-action="DeleteRoom" asp-route-id="@room.RoomId" class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </a>
-                            <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
-                                <i class="fa fa-check-square"></i>
-                                Đặt ngay
-                            </a>
-                        }
-                        @if (isNotOwner)
-                        {
-                            <a asp-area="Users" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Return
-                            </a>
-                        }
-                        @if (isUser)
-                        {
-                            <a asp-area="Users" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
-                                <i class="fas fa-undo"></i> Return
-                            </a>
-                            <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
-                                <i class="fa fa-check-square"></i>
-                                Đặt ngay
-                            </a>
-                        }
-                    </td>
-                </tr>
+                if (isOwner || room.StatusRoom == Room.StatusRoom.Available) 
+                {
+                    <tr>
+                        <td>@room.RoomNumber</td>
+                        <td>@room.RoomType</td>
+                        <td>@room.Price VND</td>
+                        <td>@room.StatusRoom.ToString()</td> 
+                        <td>@room.BedCount</td>
+                        <td>
+                                @if (!string.IsNullOrEmpty(room.RoomImgUrl))
+                                {
+                                    <img src="@room.RoomImgUrl" alt="RoomImage" style="height: 200px; object-fit: cover; margin:0 auto; display:block" />
+                                }
+                                else
+                                {
+                                    <p>Image not available</p>
+                                } 
+                        </td>
+                        <td>
+                            @if (isOwner)
+                            {
+                                <a asp-area="Owner" asp-controller="Room" asp-action="EditRoom" asp-route-id="@room.RoomId" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <a asp-area="Owner" asp-controller="Room" asp-action="DeleteRoom" asp-route-id="@room.RoomId" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </a>
+                                @if (room.StatusRoom == Room.StatusRoom.Occupied)
+                                {
+                                    <a asp-area="Owner" asp-controller="Room" asp-action="CustomerReturnRoom" asp-route-id="@room.RoomId" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-undo-alt"></i> Return Room
+                                    </a>
+                                }
+                            }
+                            @if (isNotOwner)
+                            {
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-secondary btn-sm">
+                                    <i class="fas fa-undo"></i> Return
+                                </a>
+                            }
+                            @if (isUser && room.StatusRoom == Room.StatusRoom.Available)
+                            {
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <a asp-area="Users" asp-controller="Booking" asp-action="BookingRoom" asp-route-id="@room.RoomId" class="btn btn-success btn-sm">
+                                        <i class="fa fa-check-square"></i> Booking now
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a asp-area="Identity" asp-controller="Account" asp-action="Login" class="btn btn-success btn-sm">
+                                        <i class="fa fa-check-square"></i> Booking now
+                                    </a>
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 </div>
 
+@using (Html.BeginForm("CreateReview", "Hotel", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reviewModal">
+        Add a review
+    </button>
+    <div class="modal fade" id="reviewModal" tabindex="-1" role="dialog" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 style="color: green; font-family:'Times New Roman', Times, serif" class="modal-title" id="reviewModalLabel">Leave your review here</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                    <form asp-controller="Hotel" asp-action="CreateReview" asp-route-HotelId="@Model.HotelId" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="HotelId" value="@Model.HotelId" />
+                        <div class="form-group">
+                            <textarea name="Comment" id="Comment" class="form-control" rows="4">@Model.NewHotelReview?.Comment</textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.NewHotelReview.Image">Upload Image (optional)</label>
+                            <input type="file" name="Image" class="form-control" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post a review</button>
+                    </form>
+
+            </div>
+        </div>
+    </div>
+</div> 
+    
+}
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLa7aRZIytG+3mtnwXgUFlIFmDIqk73kFgyV" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
 
 @section Scripts {
-    @{
-        <partial name="_ValidationScriptsPartial" />
-    }
+    <partial name="_ValidationScriptsPartial" />
 }

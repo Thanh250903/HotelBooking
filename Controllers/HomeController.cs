@@ -13,6 +13,7 @@ using HotelApp.Constants;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using HotelApp.Models.User;
 
 
 namespace HotelApp.Controllers
@@ -62,6 +63,19 @@ namespace HotelApp.Controllers
         public IActionResult Contact()
         {
             return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendEmail(Contact contact)
+        {
+            if (ModelState.IsValid)
+            {
+                var systemEmail = "vutienthanh250903@gmail.com";
+                await _emailSender.SendEmailAsync(systemEmail, contact.Subject,
+                  $"From: {contact.Name} - {contact.Email}<br/>Message: {contact.Message}");
+                ViewBag.Message = "Your message has been sent successfully";
+                return View("Contact");
+            }
+            return View("Contect", contact);
         }
         public IActionResult Privacy()
         {
@@ -193,6 +207,7 @@ namespace HotelApp.Controllers
                     owner.UserName = input.Email;
                     owner.Email = input.Email;
                     owner.Name = input.Name;
+                    owner.PasswordHash = input.Password;
                     owner.UserAddress = input.Address;
                     owner.PhoneNumber = input.PhoneNumber;
                     owner.Role = "Owner";

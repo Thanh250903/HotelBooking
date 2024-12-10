@@ -17,7 +17,7 @@ namespace HotelApp.Models.Hotel.VM
         public string ExpirationDate { get; set; }
         [Required]
         public string CCV {  get; set; }
-        public decimal TotalPrice { get; set; }
+        public int TotalPrice { get; set; }
 
         //public Payment.PersonDetail PersonDetail { get; set; }
     }

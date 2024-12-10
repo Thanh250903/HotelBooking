@@ -1,0 +1,62 @@
+﻿@model HotelApp.Models.Hotel.VM.BookingVM
+
+<h2>Payment</h2>
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+
+<form method="post" class="container" asp-action="ConfirmPayment">
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="HotelId" />
+    <input type="hidden" asp-for="RoomId" />
+    <input type="hidden" asp-for="TotalPrice" />
+    <div class="border p-4 rounded shadow-sm">
+        <div class="mb-3 row">
+            <label asp-for="RoomNumber" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="RoomNumber" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="CheckInDate" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckInDate" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="CheckOutDate" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckOutDate" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="TotalPrice" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="TotalPrice" class="form-control" readonly/>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center row">
+        <div class="col">
+            <button type="submit" class="btn btn-primary w-100">Confirm and Pay</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

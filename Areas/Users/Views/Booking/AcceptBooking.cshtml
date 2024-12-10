@@ -1,32 +1,26 @@
 ﻿@model HotelApp.Models.Hotel.VM.ConfirmBookingVM
-<h1>This is view for accept booking</h1>
-<form method="post" asp-action="AcceptBooking">
+
+<h2>Confirm booking</h2>
+
+<form asp-action="AcceptBooking" method="post">
     <input type="hidden" asp-for="RoomBookingId" />
     <div class="form-group">
-        <label asp-for="FullName"></label>
+        <label asp-for="FullName" class="control-label"></label>
         <input asp-for="FullName" class="form-control" />
-        <span asp-validation-for="FullName" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Nationality"></label>
+        <label asp-for="Nationality" class="control-label"></label>
         <input asp-for="Nationality" class="form-control" />
-        <span asp-validation-for="Nationality" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="PhoneNumber"></label>
+        <label asp-for="PhoneNumber" class="control-label"></label>
         <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Email"></label>
+        <label asp-for="Email" class="control-label"></label>
         <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
     </div>
-
-    <div class="text-center row">
-        <div class="col">
-            <button type="submit" class="btn btn-primary w-100" ; uppercaseText>Xác nhận để vào quá trình thanh toán</button>
-        </div>
-    </div>
-
+    <button type="submit" class="btn btn-primary">Confirm and payment</button>
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-secondary">Return</a>
 </form>
+

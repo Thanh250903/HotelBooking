@@ -1,6 +1,5 @@
 ﻿using HotelApp.Data;
-using HotelApp.Models.Hotel;
-using HotelApp.Models.Others;
+using HotelApp.Models.Payment;
 using HotelApp.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 

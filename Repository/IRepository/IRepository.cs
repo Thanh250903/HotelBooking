@@ -10,7 +10,7 @@ namespace HotelApp.Repository.IRepository
         T FirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null);
         void Add(T entity);
         void Delete(T entity);
-        Room GetFirstOrDefault(Expression<Func<Room, bool>> filter, Room defaultValue = null, string includeProperties = null);
+        Room GetRoomFirstOrDefault(Expression<Func<Room, bool>> filter, Room defaultValue = null, string includeProperties = null);
         T GetFirstOrDefault(Expression<Func<T, bool>> filter, string? includeProperties = null);
         Hotel GetFirstOrDefault(Expression<Func<Hotel, bool>> filter, string? includeProperties = null);
         IEnumerable<T> Include(params Expression<Func<T, object>>[] includeProperties);

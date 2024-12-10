@@ -17,20 +17,20 @@ namespace HotelApp.Repository
         {
             _dbContext.Rooms.Update(entity);
         }
-        
+
         public Room GetById(int id)
         {
             return _dbContext.Rooms.Include(room => room.Hotel)
-                             .FirstOrDefault(room => room.RoomId == id); 
+                             .FirstOrDefault(room => room.RoomId == id);
         }
         // querry room by id
         // lấy ds phòng của một khách sạn cụ thể
-        public IEnumerable<Room> GetRoomsByHotelId(int HotelId) 
+        public IEnumerable<Room> GetRoomsByHotelId(int HotelId)
         {
             return _dbContext.Rooms.Where(r => r.HotelId == HotelId).ToList();
         }
         // xem ds tất cả các phòng
-        public IEnumerable<Room> GetAll(Expression<Func<Room, bool>> filter = null) 
+        public IEnumerable<Room> GetAll(Expression<Func<Room, bool>> filter = null)
         {
             IQueryable<Room> query = _dbContext.Rooms;
 
@@ -42,7 +42,7 @@ namespace HotelApp.Repository
 
             return query.ToList();
         }
-        
+
         public bool IsRoomNumberUnique(int hotelId, int roomNumber)
         {
             return !_dbContext.Rooms.Any(r => r.HotelId == hotelId && r.RoomNumber == roomNumber); // not use
@@ -55,12 +55,12 @@ namespace HotelApp.Repository
 
         public async Task AddRoom(Room room)
         {
-           await _dbContext.Rooms.AddAsync(room);
+            await _dbContext.Rooms.AddAsync(room);
         }
 
         public async Task<bool> IsRoomNumberUniqueAsync(int hotelId, int roomNumber)
         {
-           return !await _dbContext.Rooms.AnyAsync(room => room.HotelId == hotelId && room.RoomNumber == roomNumber);
+            return !await _dbContext.Rooms.AnyAsync(room => room.HotelId == hotelId && room.RoomNumber == roomNumber);
         }
 
         public async Task<IEnumerable<Room>> GetRoomsByHotelIdAsync(int hotelId)
@@ -80,8 +80,33 @@ namespace HotelApp.Repository
 
         public async Task<IEnumerable<Room>> GetAllRoomAsync()
         {
-           return await _dbContext.Rooms.ToListAsync();
+            return await _dbContext.Rooms.ToListAsync();
+        }
+
+        // Cập nhật phương thức GetFirstOrDefault
+        public Room GetRoomFirstOrDefault(Expression<Func<Room, bool>> filter, Room defaultValue = null, string includeProperties = null)
+        {
+            IQueryable<Room> query = _dbContext.Rooms;
+
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            return query.FirstOrDefault(filter) ?? defaultValue;
+        }
+
+        public IEnumerable<Room> Include(params Expression<Func<Room, object>>[] includeProperties)
+        {
+            IQueryable<Room> query = _dbContext.Rooms;
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
+            return query.ToList();
         }
     }
 }
-

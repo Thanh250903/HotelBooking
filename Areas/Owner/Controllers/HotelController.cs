@@ -7,8 +7,7 @@ using HotelApp.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualBasic;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+
 
 namespace HotelApp.Controllers
 {
@@ -44,44 +43,186 @@ namespace HotelApp.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet]
         [Route("Hotel/Details/{id:int}")]
         public async Task<IActionResult> Details(int id)
         {
-            var hotelList = _unitOfWork.HotelRepository.GetHotelByIdAsync(id);
-            var hotel = await hotelList;
+            // Query a hotel by id
+            var hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id);
             if (hotel == null)
             {
+                TempData["error"] = "Hotel not found to display detail";
                 return NotFound();
             }
 
+            // Lấy thông tin người dùng hiện tại và kiểm tra quyền sở hữu
             var ownerId = _userManager.GetUserId(User);
             var isUser = User.IsInRole("User");
-            var isOwner = hotel.OwnerId == ownerId;// checking this Owner this hotel or not
+            var isOwner = hotel.OwnerId == ownerId;
             var isNotOwner = !isOwner && User.IsInRole("Owner");
 
+            // Lấy các đánh giá về khách sạn
+            var reviews = await _unitOfWork.HotelReviewRepository.GetReviewsByHotelIdAsync(id);
             var rooms = await _unitOfWork.RoomRepository.GetRoomsByHotelIdAsync(id);
-            var roomVM = rooms.Select(room => new RoomVM
+            var hotelDetailsVM = new HotelDetailsVM
             {
-                RoomId = room.RoomId,
-                HotelId = room.HotelId,
-                RoomNumber = room.RoomNumber,
-                RoomType = room.RoomType,
-                Price = room.Price,
-                StatusRoom = room.StatusRooms,
-                BedCount = room.BedCount,
-                RoomImgUrl = room.RoomImgUrl,
+                HotelId = hotel.HotelId,
+                HotelName = hotel.HotelName,
+                Description = hotel.Description,
+                City = hotel.City,
+                ImageUrl = hotel.ImageUrl,
                 IsOwner = isOwner,
-            }).ToList();   //take room list 
+                Rooms = rooms.Select(room => new RoomVM
+                {
+                    RoomId = room.RoomId,
+                    HotelId = hotel.HotelId,
+                    RoomNumber = room.RoomNumber,
+                    RoomType = room.RoomType,
+                    Price = room.Price,
+                    StatusRoom = room.StatusRooms,
+                    BedCount = room.BedCount,
+                    RoomImgUrl = room.RoomImgUrl,
+                    IsOwner = isOwner,
+                }).ToList(),
+                HotelReviews = reviews,
+                NewHotelReview = new HotelReview
+                {
+                    HotelId = hotel.HotelId,
+                    Comment = ""
+                },
+                TotalReviews = reviews.Count()
 
-            // Solve data
-            var hotels = new List<Hotel> { hotel };
-            ViewBag.Hotels = hotels;
+            };
             ViewBag.IsUser = isUser;
             ViewBag.IsOwner = isOwner;
             ViewBag.IsNotOwner = isNotOwner;
+            ViewBag.UserManager = _userManager;
 
-            return View(roomVM);
+            return View(hotelDetailsVM);
         }
+
+        //[AllowAnonymous]
+        [HttpPost]
+        [Route("/Hotel/CreateReview")]
+        public async Task<IActionResult> CreateReview([Bind("HotelId, Comment, Image")] HotelReview hotelReview, IFormFile? Image)
+        {
+            if (ModelState.IsValid)
+            {
+                if(Image != null && Image.Length > 0)
+                {
+                    var wwwRootPath = Path.Combine(_webHostEnvironment.WebRootPath, "img");
+                    var fileName = Path.GetFileName(Image.FileName);
+                    var filePath = Path.Combine(wwwRootPath, fileName);
+
+                    try
+                    {
+                        if (!Directory.Exists(wwwRootPath))
+                        {
+                            Directory.CreateDirectory(wwwRootPath);
+                        }
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Image.CopyToAsync(fileStream);
+                        }
+                        hotelReview.Image = $"/img/" + fileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("", "Image upload error: " + ex.Message);
+                        return View(hotelReview);
+                    }
+                }
+                else
+                {
+                    hotelReview.Image = hotelReview.Image;
+                }
+
+                // Check the data to leave the comments
+                Console.WriteLine($"HotelId: {hotelReview.HotelId}, Comment: {hotelReview.Comment}, Image: {hotelReview.Image}");
+
+                var userId = User.Identity.IsAuthenticated ? _userManager.GetUserId(User) : null;
+                hotelReview.UserId = userId;
+                hotelReview.CreateAt = DateTime.Now;
+
+                _unitOfWork.HotelReviewRepository.Add(hotelReview);
+                await _unitOfWork.SaveAsync();
+                TempData["success"] = "Your comment added successfully";
+                return RedirectToAction("Details", new
+                {
+                    id = hotelReview.HotelId 
+                });
+            }
+            TempData["error"] = "Failed to add your review. Please check your input.";
+            var hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(hotelReview.HotelId);
+            if (hotel == null)
+            {
+                TempData["error"] = "Hotel not exits";
+                return NotFound();
+            }
+
+            var reviews = await _unitOfWork.HotelReviewRepository.GetReviewsByHotelIdAsync(hotelReview.HotelId);
+            var rooms = await _unitOfWork.RoomRepository.GetRoomsByHotelIdAsync(hotelReview.HotelId);
+
+            var hotelDetailsVM = new HotelDetailsVM
+            {
+                HotelId = hotel.HotelId,
+                HotelName = hotel.HotelName,
+                Description = hotel.Description,
+                City = hotel.City,
+                ImageUrl = hotel.ImageUrl,
+                IsOwner = hotel.OwnerId == _userManager.GetUserId(User),
+                Rooms = rooms.Select(room => new RoomVM
+                {
+                    RoomId = room.RoomId,
+                    HotelId = hotel.HotelId,
+                    RoomNumber = room.RoomNumber,
+                    RoomType = room.RoomType,
+                    Price = room.Price,
+                    StatusRoom = room.StatusRooms,
+                    BedCount = room.BedCount,
+                    RoomImgUrl = room.RoomImgUrl,
+                    IsOwner = hotel.OwnerId == _userManager.GetUserId(User),
+                }).ToList(),
+                HotelReviews = reviews,
+                NewHotelReview = hotelReview,
+            };
+
+            ViewBag.IsUser = User.IsInRole("User");
+            ViewBag.IsOwner = hotel.OwnerId == _userManager.GetUserId(User);
+            ViewBag.IsNotOwner = !ViewBag.IsOwner && User.IsInRole("Owner");
+
+            return View("Details", hotelDetailsVM);
+        }
+        [HttpPost]
+        [Authorize(Roles = "User, Owner")]
+        public async Task<IActionResult> DeleteReview (int reviewId)
+        {
+            var review = await _unitOfWork.HotelReviewRepository.GetByIdAsync(reviewId);
+            if(review == null)
+            {
+                TempData["error"] = "Couldn't found the review you want to delete";
+                return NotFound();
+            }
+
+            var userId = _userManager.GetUserId(User);
+            var isOwner = review.Hotel.OwnerId == userId;
+            var isUser = review.UserId == userId;
+
+            if(!isOwner && isUser)
+            {
+                TempData["error"] = "You don't have premission to delete this review";
+                return Unauthorized();
+            }
+
+            _unitOfWork.HotelReviewRepository.Delete(review);
+            await _unitOfWork.SaveAsync();
+            TempData["success"] = "Review deleted successfully";
+            return RedirectToAction("Details", new 
+            {
+                id = review.HotelId 
+            });
+        }
+
         [HttpGet]
         public IActionResult CreateHotel()
         {
@@ -142,16 +283,19 @@ namespace HotelApp.Controllers
             
             if (id == null || id == 0)
             {
+               TempData["error"] = "Hotel id not exits";
                return NotFound();
             }
             var ownerId = _userManager.GetUserId(User);
             if (!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(id.Value, ownerId))
             {
+                TempData["error"] = "You don't have premission to edit this hotel";
                 return Unauthorized();
             }
             var hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
+                TempData["error"] = "Counld't found a hotel to edit";
                 NotFound();
             }
             return View(hotel);
@@ -163,6 +307,7 @@ namespace HotelApp.Controllers
         {
             if(hotelId != hotel.HotelId)
             {
+                TempData["error"] = "Hotel Id not found";
                 return NotFound();
             }
             var ownerId = _userManager.GetUserId(User);
@@ -198,16 +343,19 @@ namespace HotelApp.Controllers
             Hotel hotel = new Hotel();
             if (id == 0 || id == null)
             {
+                TempData["error"] = "Hotel Id not found";
                 return NotFound();
             }
             hotel = await _unitOfWork.HotelRepository.GetHotelByIdAsync(id.Value);
             if (hotel == null)
             {
+                TempData["error"] = "Hotel not found";
                 return NotFound();  
             }
             var ownerId = _userManager.GetUserId(User);
             if (!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(id.Value, ownerId))
             {
+                TempData["error"] = "You don't have premission to edit this hotel";
                 return Unauthorized();
             }
             return View(hotel);
@@ -219,6 +367,7 @@ namespace HotelApp.Controllers
             var ownerId = _userManager.GetUserId(User);
             if(!await _unitOfWork.HotelRepository.IsHotelOwnerAsync(hotel.HotelId, ownerId)) 
             {
+                TempData["error"] = "You don't have premission to delete this hotel";
                 return Unauthorized();
             }
 
@@ -228,5 +377,6 @@ namespace HotelApp.Controllers
             TempData["ShowMessage"] = true;
             return RedirectToAction("HotelList");
         }
+
     }
 }
