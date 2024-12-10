@@ -85,9 +85,9 @@
                                 <li class="nav-item">
                                     <a asp-area="Admin" asp-controller="Users" asp-action="Index">List of Accounts |</a>
                                 </li>
-                                <li class="nav-item">
+                              @*   <li class="nav-item">
                                     <a asp-area="Identity" asp-controller="Users" asp-action="ConfirmAccount"> List of confirm account</a>
-                                </li>
+                                </li> *@
                             }
                             else
                             {
@@ -113,9 +113,8 @@
                                         <div class="dropdown-menu rounded-0 m-0">
                                             <a asp-area="Owner" asp-controller="Hotel" asp-action="CreateHotel" class="dropdown-item">Create Hotel</a>
                                             <a asp-area="Owner" asp-controller="Hotel" asp-action="HotelList" class="dropdown-item">List of Hotel</a>
-                                         @* có thể dùng để quản lý tk Staff    <a asp-area="" asp-controller="Home" asp-action="ManageUser" class="dropdown-item">User</a> *@ 
-                                            <a href="testimonial.html" class="dropdown-item">Review</a>
-                                            <a href="#" class="dropdown-item">Manage Staff Account</a>
+                                           @*  <a asp-area="Owner" asp-controller="Room" asp-action="RoomRented" class="dropdown-item">List of Room Rented</a> *@
+                                           @*  <a href="#" class="dropdown-item">Manage Staff Account</a> *@
                                         </div>
                                     </div>
                                 </div>
@@ -136,9 +135,35 @@
                             var userPicture = await UserManagerProfile.GetUserPictureAsync(User);
                         }
                         <ul class="navbar-nav">
-                            @if (User.IsInRole("Admin") || User.IsInRole("Owner") || User.IsInRole("Staff") || User.IsInRole("User"))
+                            @if (User.IsInRole("Staff") || User.IsInRole("User"))
                             {
                                 <p id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><b style="color:coral">Hello,  </b> <span style="color: #FEA116">@UserManager.GetUserName(User)</span></p>
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Edit Profile</a>
+                                    <div class="dropdown-menu rounded-0 m-0">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Index">
+                                            <img src="@userPicture" alt="User_Avatar" style="width: 150px; height: 150px; border-radius:50%;" />
+                                        </a>
+                                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" title="Change Password">Change Password</a>
+                                    </div>
+                                </div>
+                            }
+                            @if (User.IsInRole("Owner"))
+                            {
+                                <p id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><b style="color:coral">Hello, Owner  </b> <span style="color: #FEA116">@UserManager.GetUserName(User)</span></p>
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Edit Profile</a>
+                                    <div class="dropdown-menu rounded-0 m-0">
+                                        <a asp-area="Identity" asp-page="/Account/Manage/Index">
+                                            <img src="@userPicture" alt="User_Avatar" style="width: 150px; height: 150px; border-radius:50%;" />
+                                        </a>
+                                        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" title="Change Password">Change Password</a>
+                                    </div>
+                                </div>
+                            }
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <p id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage"><b style="color:coral">Hello, Admin  </b> <span style="color: #FEA116">@UserManager.GetUserName(User)</span></p>
                                 <div class="nav-item dropdown">
                                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Edit Profile</a>
                                     <div class="dropdown-menu rounded-0 m-0">

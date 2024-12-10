@@ -4,7 +4,6 @@ using HotelApp.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-
 namespace HotelApp.Repository
 {
     public class BookingRepository : Repository<BookingRepository>, IBookingRepository
@@ -25,7 +24,6 @@ namespace HotelApp.Repository
         public IEnumerable<RoomBooking> GetBookingByRoomId (int roomId)
         {
             return _dbContext.RoomBookings.Where(r => r.RoomId == roomId).ToList();
-            //return _dbContext.RoomBookings.Include(roombooking => roombooking.User).Where(roombooking =>roombooking.RoomId == roomId).ToList();
         }
 
         public RoomBooking GetFirstOrDefault(Expression<Func<RoomBooking, bool>> filter, string includeProperties = null)
@@ -89,9 +87,9 @@ namespace HotelApp.Repository
         {
             _dbContext.Remove(entity);
         }
-        public void Update(RoomBooking entity)
+        public void Update(RoomBooking booking)
         {
-            _dbContext.Update(entity);
+            _dbContext.RoomBookings.Update(booking);
         }
 
         public IEnumerable<RoomBooking> Include(params Expression<Func<RoomBooking, object>>[] includeProperties)
@@ -102,6 +100,21 @@ namespace HotelApp.Repository
         public RoomBooking FirstOrDefault(Expression<Func<RoomBooking, bool>> filter, string? includeProperties = null)
         {
             throw new NotImplementedException();
+        }
+
+        public RoomBooking Get(Expression<Func<RoomBooking, bool>> filter)
+        {
+            return _dbContext.RoomBookings.FirstOrDefault(filter);
+        }
+
+        public Room GetRoomFirstOrDefault(Expression<Func<Room, bool>> filter, Room defaultValue = null, string includeProperties = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<RoomBooking> GetRoomBookingByIdAsync(int id)
+        {
+            return await _dbContext.RoomBookings.FirstOrDefaultAsync(roomboking => roomboking.RoomBookingId == id);
         }
     }
 }

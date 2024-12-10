@@ -7,13 +7,14 @@ using HotelApp.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Linq.Expressions;
 using static HotelApp.Models.Hotel.Room;
 
 namespace HotelApp.Areas.Users.Controllers
 {
-    [Area("User")]
-    [Authorize(Roles = "User")]
+    [Area("Users")]
+    //[Authorize(Roles = "User")]
     public class BookingController : Controller
     {
         private readonly ApplicationDBContext _dbContext;
@@ -31,41 +32,58 @@ namespace HotelApp.Areas.Users.Controllers
             List<RoomBooking> roombookings = _unitOfWork.BookingRepository.GetBookingByRoomId(roomId).ToList();
             return View(roombookings);
         }
-        [HttpGet]
-        //Querry search room available
-        public IActionResult SearchingAvailableRooms(DateTime checkinDate, DateTime checkoutDate, int hotelId)
-        {
-            var availableRoom = _dbContext.Rooms.Where(room => !_dbContext.RoomBookings
-               .Any(roombooking => roombooking.RoomId == room.RoomId && roombooking.CheckInDate < checkoutDate
-               && roombooking.CheckOutDate > checkinDate))
-                .Where(room => room.HotelId == hotelId && room.StatusRooms == StatusRoom.Available).ToList();
+        //[HttpGet]
+        ////Querry search room available
+        //public IActionResult SearchingAvailableRooms(DateTime checkinDate, DateTime checkoutDate, int hotelId)
+        //{
+        //    var availableRoom = _dbContext.Rooms.Where(room => !_dbContext.RoomBookings
+        //       .Any(roombooking => roombooking.RoomId == room.RoomId && roombooking.CheckInDate < checkoutDate
+        //       && roombooking.CheckOutDate > checkinDate))
+        //        .Where(room => room.HotelId == hotelId && room.StatusRooms == StatusRoom.Available).ToList();
 
-            return View(availableRoom);
-        }
+        //    return View(availableRoom);
+        //}
 
         [HttpGet]
         public async Task<IActionResult> BookingRoom(int id)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["error"] = "You must login to the system to booking a room";
+                return RedirectToAction("Login", "Account");
+            }
+
             var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(id);
 
             if (room == null)
             {
-                return NotFound("Room not found, try again");
+                TempData["error"] = "Room not exists";
+                return NotFound();
             }
 
             // Checkking room available or not
             if (room.StatusRooms != StatusRoom.Available)
             {
-                return NotFound("Room is not available for booking");
+                return NotFound();
             }
+
+            var user = await _userManager.GetUserAsync(User); 
+            if (user == null) 
+            {
+                return RedirectToAction("Login", "Account"); 
+            }
+            // use BookingVM that contain UserId, RoomId, Price to create new Booking Room 
 
             BookingVM bookingVM = new BookingVM
             {
+                UserId = user.Id,
                 RoomId = id,
+                HotelId = room.HotelId,
                 RoomNumber = room.RoomNumber,
-                TotalPrice = room.Price,
+                Price = room.Price,
                 CheckInDate = DateTime.Now,
                 CheckOutDate = DateTime.Now.AddDays(1),
+                TotalPrice = room.Price
             };
 
             return View(bookingVM);
@@ -75,60 +93,74 @@ namespace HotelApp.Areas.Users.Controllers
         [HttpPost]
         public async Task<IActionResult> BookingRoom(BookingVM bookingVM)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(bookingVM.RoomId);
-
-                if (room == null)
+                foreach (var modelState in ViewData.ModelState.Values)
                 {
-                    return NotFound("Room not exists");
+                    foreach (var error in modelState.Errors)
+                    {
+                        Console.WriteLine(error.ErrorMessage);
+                    }
                 }
-
-                if (room.StatusRooms != StatusRoom.Available)
-                {
-                    return NotFound("Room is not available for booking");
-                }
-                 // gặp lỗi khi cố gắng thêm User
-                //var user = await _userManager.GetUserAsync(User); 
-                //if (user == null)
-                //{
-                //    return RedirectToAction("Login", "Account");
-                //}
-
-                //var takeUser = await _userManager.FindByIdAsync(user.Id);
-                //if (takeUser == null)
-                //{
-                //    return NotFound("User not exits");
-                //}
-
-                var roomBooking = new RoomBooking
-                {
-                    RoomId = bookingVM.RoomId,
-                    //UserId = user.Id,
-                    //User = user, 
-                    BookingDate = bookingVM.BookingDate,
-                    CheckInDate = bookingVM.CheckInDate,
-                    CheckOutDate = bookingVM.CheckOutDate,
-                    TotalPrice = bookingVM.TotalPrice,
-
-                };
-
-                _unitOfWork.BookingRepository.Add(roomBooking);
-                //room.StatusRooms = StatusRoom.Occupied;
-                _unitOfWork.Save();
-                TempData["success"] = "Booking a room successfully, next step to confirm";
-
-                return RedirectToAction("AcceptBooking", new
-                {
-                    bookingId = roomBooking.RoomBookingId
-                });
-
+                TempData["error"] = "Invalid data. Please check the input.";
+                return View(bookingVM);
             }
-            else
+
+            var room = await _unitOfWork.RoomRepository.GetRoomByIdAsync(bookingVM.RoomId);
+
+            if (room == null)
             {
-                TempData["error"] = "Try again";
+                TempData["error"] = "Room is not available for booking";
+                return NotFound();
             }
-            return View(bookingVM);
+
+            if (room.StatusRooms != StatusRoom.Available)
+            {
+                TempData["error"] = "Room is not available for booking";
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userId = await _userManager.FindByIdAsync(user.Id);
+            if (userId == null)
+            {
+                TempData["error"] = "User not found";
+                return NotFound();
+            }
+
+            // Set UserId in bookingVM
+            bookingVM.UserId = user.Id;
+
+            //calculating price each night
+            int priceEachNight = (bookingVM.CheckOutDate - bookingVM.CheckInDate).Days;
+            bookingVM.TotalPrice = priceEachNight * bookingVM.Price;
+
+            var roomBooking = new RoomBooking
+            {
+                RoomId = bookingVM.RoomId,
+                UserId = bookingVM.UserId,
+                User = userId,
+                BookingDate = bookingVM.BookingDate,
+                CheckInDate = bookingVM.CheckInDate,
+                CheckOutDate = bookingVM.CheckOutDate,
+                TotalPrice = bookingVM.TotalPrice,
+                PricePerNight = bookingVM.Price,
+                IsPaid = true,
+            };
+
+            _unitOfWork.BookingRepository.Add(roomBooking);
+            room.StatusRooms = StatusRoom.Occupied;
+            _unitOfWork.Save();
+            TempData["success"] = "Booking a room successfully, click next to confirm";
+            return RedirectToAction("AcceptBooking", new
+            {
+                bookingId = roomBooking.RoomBookingId
+            });
         }
 
         [HttpGet]
@@ -139,81 +171,51 @@ namespace HotelApp.Areas.Users.Controllers
             {
                 return NotFound("Cannot find booking's data");
             }
-            // access to donfirmbooking
+
             var confirmbookingVM = new ConfirmBookingVM
             {
                 RoomBookingId = booking.RoomBookingId,
-                // user will insert it
-                FullName = "", 
+                FullName = "",
                 Nationality = "",
                 PhoneNumber = "",
                 Email = "",
-
             };
             return View(confirmbookingVM);
         }
 
         [HttpPost]
-        public IActionResult AcceptBooking(ConfirmBookingVM confirmBookingVM)
+        public async Task<IActionResult> AcceptBooking(ConfirmBookingVM confirmBookingVM)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var booking = _unitOfWork.BookingRepository.Get(accpetbooking => accpetbooking.RoomBookingId == confirmBookingVM.RoomBookingId);
                 if (booking == null)
                 {
-                    return RedirectToAction("AccpetBooking", new
+                    return RedirectToAction("AcceptBooking", new
                     {
                         bookingId = confirmBookingVM.RoomBookingId,
                     });
                 }
-
-                // may not logic, use Identity User
-                ConfirmBookingVM confirmBookingVM1 = new ConfirmBookingVM
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
                 {
-                    RoomBookingId= confirmBookingVM.RoomBookingId,
-                    FullName = confirmBookingVM.FullName,
-                    Nationality = confirmBookingVM.Nationality,
-                    PhoneNumber = confirmBookingVM.PhoneNumber,
-                    Email = confirmBookingVM.Email,
-                };
-                return RedirectToAction("Payment", "Payment", new 
-                { 
-                    bookingId = booking.RoomBookingId }
-                );
+                    return RedirectToAction("Login", "Account"); 
+                }
 
+                ViewBag.RoomBookingId = booking.RoomBookingId;
+                ViewBag.UserId = user.Id;
+
+                return RedirectToAction("CreatePaymentUrl", "Payment", new
+                {
+                    RoomBookingId = booking.RoomBookingId,
+                    Amount = booking.TotalPrice,
+                    OrderDescription = "Pay ment for hotel",
+                    Name = user.UserName,
+                    UserId = user.Id
+                });
             }
             return View(confirmBookingVM);
         }
-
-
-
-       
-
-        // Handle Payment process
-        //[HttpPost]
-        //public IActionResult Payment (int bookingId, string paymentMethod)
-        //{
-        //    var booking = _unitOfWork.BookingRepository.FirstOrDefault(roombooking => roombooking.RoomBookingId != bookingId);
-        //    if(booking == null || booking.PaymentStatus == PaymentSatus.Paid) 
-        //    {
-        //        return NotFound("Cannot handle payment");
-        //    }
-        //    var payment = new Payment
-        //    {
-        //        RoomBookingId = bookingId,
-        //        PaymentMethod = paymentMethod,
-        //        Amount = booking.TotalPrice,
-        //        PaymentDate = DateTime.Now
-        //    };
-
-        //    booking.PaymentStatus = "Paid";
-        //    booking.BookingStatus = "Confirmed";
-
-        //    _context.Payments.Add(payment);
-        //    _context.SaveChanges();
-
-        //    return RedirectToAction("BookingDetails", new { bookingId = bookingId });
-        //}
 
 
     }

@@ -1,0 +1,119 @@
+﻿@* @model HotelApp.Models.Hotel.VM.BookingVM
+
+<h2>Payment</h2>
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["success"]
+    </div>
+}
+
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["error"]
+    </div>
+}
+
+<form method="post" class="container" asp-action="ConfirmPayment">
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" asp-for="HotelId" />
+    <input type="hidden" asp-for="RoomId" />
+    <input type="hidden" asp-for="TotalPrice" />
+    <div class="border p-4 rounded shadow-sm">
+        <div class="mb-3 row">
+            <label asp-for="RoomNumber" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="RoomNumber" class="form-control" disabled />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="BookingDate" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="BookingDate" class="form-control" id="BookingDate" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="CheckInDate" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckInDate" class="form-control" id="CheckInDate" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="CheckOutDate" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckOutDate" class="form-control" id="CheckOutDate" readonly />
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="TotalPrice" class="control-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="TotalPrice" class="form-control" id="TotalPrice" readonly />
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center row">
+        <div class="col">
+            <button type="submit" class="btn btn-primary w-100">Confirm and Pay</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}
+ *@
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Thanh toán VnPay tại <a href="https://code-mega.com">Code Mega</a></h1>
+    <p>Learn about <a href="https://code-mega.com">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="table-responsive">
+    <form asp-area="Users" asp-controller="Payment"  asp-action="CreatePaymentUrl" id="frmCreateOrder" method="POST">
+        <div class="form-group">
+            <label for="ordertype">Loại hàng hóa </label>
+            <select name="OrderType" id="ordertype" class="form-control">
+                <option value="electric">Đồ điện tử</option>
+                <option value="fashion">Thời trang</option>
+                <option value="other">Khác</option>
+            </select>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="Name">Tên khách hàng</label>
+            <input class="form-control"
+                   id="Name"
+                   name="Name"
+                   type="text"
+                   value="Code Mega">
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="Amount">Số tiền</label>
+            <input class="form-control"
+                   id="Amount"
+                   name="Amount"
+                   type="text"
+                   value="20000000">
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="OrderDescription">Nội dung thanh toán</label>
+            <textarea class="form-control"
+                      cols="20"
+                      id="OrderDescription"
+                      name="OrderDescription"
+                      rows="2">Thanh toán tại Code Mega</textarea>
+        </div>
+        <br />
+        <button type="submit" class="btn btn-primary">Thanh toán (Checkout)</button>
+    </form>
+</div>

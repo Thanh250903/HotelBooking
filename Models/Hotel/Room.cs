@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 
 namespace HotelApp.Models.Hotel
@@ -20,8 +21,7 @@ namespace HotelApp.Models.Hotel
         [ValidateNever]
         public string RoomType { get; set; } // dạng phòng, vd double, family, single, suite
         [ValidateNever]
-        [DataType(DataType.Currency)] // attributes kiểu tiền tệ
-        public decimal Price { get; set; } // giá tiền của phòng
+        public int Price { get; set; } // giá tiền của phòng
         public enum StatusRoom
         {
             Available,

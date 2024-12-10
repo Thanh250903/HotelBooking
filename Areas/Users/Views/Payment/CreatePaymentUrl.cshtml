@@ -1,0 +1,38 @@
+﻿@model HotelApp.Models.Payment.PaymentInformationModel
+
+<div class="text-center">
+    <h1 class="display-4">Thanh toán VnPay tại <a href="https://code-mega.com">Code Mega</a></h1>
+    <p>Learn about <a href="https://code-mega.com">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="table-responsive">
+    <form asp-action="CreatePaymentUrl" method="post">
+        <div class="form-group">
+            <label asp-for="OrderType" class="control-label">Loại hàng hóa</label>
+            <select asp-for="OrderType" class="form-control">
+                <option value="electric">Đồ điện tử</option>
+                <option value="fashion">Thời trang</option>
+                <option value="other">Khác</option>
+            </select>
+        </div>
+        <br />
+        <div class="form-group">
+            <label asp-for="Name" class="control-label">Tên khách hàng</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+        <br />
+        <div class="form-group">
+            <label asp-for="Amount" class="control-label">Số tiền</label>
+            <input asp-for="Amount" class="form-control" />
+        </div>
+        <br />
+        <div class="form-group">
+            <label asp-for="OrderDescription" class="control-label">Nội dung thanh toán</label>
+            <textarea asp-for="OrderDescription" class="form-control" rows="2"></textarea>
+        </div>
+        <br />
+        <input type="hidden" name="RoomBookingId" value="@ViewBag.RoomBookingId" />
+        <input type="hidden" name="UserId" value="@ViewBag.UserId" />
+        <button type="submit" class="btn btn-primary">Thanh toán (Checkout)</button>
+    </form>
+</div>
