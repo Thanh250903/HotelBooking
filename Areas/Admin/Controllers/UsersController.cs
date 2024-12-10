@@ -157,23 +157,48 @@ namespace HotelApp.Areas.Admin.Controllers
 
         //Lock account
         [HttpGet]
-        public async Task<IActionResult> LockAccount(string id)
-        {
-            var lockingUser = await _dbContext.Users.FindAsync(id);
-            if (lockingUser == null)
+        public async Task<IActionResult> LockAccount(string id) {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null) 
             {
-                return NotFound("User not found");
+                return NotFound(); 
             }
 
-            if (lockingUser.LockoutEnd != null && lockingUser.LockoutEnd > DateTime.Now)
-                lockingUser.LockoutEnd = DateTime.Now;
-            else
-                lockingUser.LockoutEnd = DateTime.Now.AddYears(1000);
-
+            if (user.LockoutEnd == null || user.LockoutEnd <= DateTime.Now) 
+            {
+                user.LockoutEnd = DateTime.Now.AddYears(1000);
+                TempData["successLockAccount"] = $"Locked account successfully! (Email: {user.UserName})";
+            }
+            else 
+            {
+                TempData["successLockAccount"] = $"Account is already locked! (Email: {user.UserName})"; 
+            }
             await _dbContext.SaveChangesAsync();
-            TempData["successLockAccount"] = "User account locked/unlocked successfully";
             TempData["ShowMessageLockAccount"] = true;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index)); 
         }
+
+        //UnLock account
+        [HttpGet]
+        public async Task<IActionResult> UnlockAccount(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound(); 
+            }
+
+            if (user.LockoutEnd != null && user.LockoutEnd > DateTime.Now) 
+            {
+                user.LockoutEnd = null;
+                TempData["successUnlockAccount"] = $"Unlocked account successfully! (Email: {user.UserName})"; 
+            }
+            else 
+            { 
+                TempData["successUnlockAccount"] = $"Account is not locked! (Email: {user.UserName})"; 
+            }
+            await _dbContext.SaveChangesAsync();
+            TempData["ShowMessageUnlockAccount"] = true;
+            return RedirectToAction(nameof(Index)); }
     }
 }

@@ -1,51 +1,95 @@
 ﻿@model HotelApp.Models.Hotel.VM.BookingVM
+
 @if (TempData["success"] != null)
 {
     <h1>@TempData["success"]</h1>
 }
-@if (TempData["error"] !=null)
+@if (TempData["error"] != null)
 {
     <h1>@TempData["error"]</h1>
 }
 
 <form method="post" class="container" asp-action="BookingRoom">
     <input type="hidden" asp-for="HotelId" />
+    <input type="hidden" asp-for="UserId" />
     <input type="hidden" asp-for="RoomId" />
+    <input type="hidden" asp-for="Price" id="Price" />
     <div class="border p-4 rounded shadow-sm">
         <div class="mb-3 row">
-            <label asp-for="@Model.RoomNumber" class="control-label"></label>
+            <label asp-for="RoomNumber" class="col-sm-2 col-form-label"></label>
             <div class="col-sm-10">
-                <input asp-for="@Model.RoomNumber" class="form-control" disabled />
+                <input asp-for="RoomNumber" class="form-control" readonly />
             </div>
         </div>
         <div class="mb-3 row">
-        <label asp-for="CheckInDate" class="control-label"></label>
-        <div class="col-sm-10">
-            <input asp-for="CheckInDate" class="form-control" />
+            <label asp-for="CheckInDate" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckInDate" class="form-control" />
+                <span asp-validation-for="CheckInDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="CheckOutDate" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="CheckOutDate" class="form-control" />
+                <span asp-validation-for="CheckOutDate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3 row">
+            <label asp-for="TotalPrice" class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                <input asp-for="TotalPrice" class="form-control" readonly    />
+            </div>
+        </div>
+        <div class="text-center row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary w-100">Booking now</button>
+            </div>
         </div>
     </div>
-    <div class="mb-3 row">
-        <label asp-for="CheckOutDate" class="control-label"></label>
-        <div class="col-sm-10">
-             <input asp-for="CheckOutDate" class="form-control" />
-        </div>
-    </div>
-    <div class="mb-3 row">
-        <label asp-for="@Model.TotalPrice" class="control-label"></label>
-        <div class="col-sm-10">
-            <input asp-for="@Model.TotalPrice" class="form-control" readonly />
-        </div>
-    </div>
-    </div>
-
-    <div class="text-center row">
-        <div class="col">
-        <button type="submit" class="btn btn-primary w-100">Đặt Ngay</button>
-        </div>
-    </div>
-  
 </form>
+
 @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkInDateInput = document.getElementById('CheckInDate');
+            const checkOutDateInput = document.getElementById('CheckOutDate');
+            const totalPriceInput = document.getElementById('TotalPrice');
+            const pricePerNight = parseFloat(document.getElementById('Price').value);
+
+            const minDate = "2024-12-01";
+            checkInDateInput.setAttribute('min', minDate);
+
+            checkInDateInput.addEventListener('change', function () {
+                if (new Date(checkInDateInput.value) < new Date(minDate)) {
+                    alert("Check-In date cannot be in the past.");
+                    checkInDateInput.value = minDate;
+                }
+                updateTotalPrice();
+            });
+
+            checkOutDateInput.addEventListener('change', function () {
+                updateTotalPrice();
+            });
+
+            function updateTotalPrice() {
+                const checkInDate = new Date(checkInDateInput.value);
+                const checkOutDate = new Date(checkOutDateInput.value);
+                if (checkOutDate > checkInDate) {
+                    const oneDay = 24 * 60 * 60 * 1000;
+                    const numberOfNights = Math.round((checkOutDate - checkInDate) / oneDay);
+                    const totalPrice = numberOfNights * pricePerNight;
+                    totalPriceInput.value = totalPrice.toFixed(0); 
+                } else {
+                    totalPriceInput.value = "0";
+                }
+            }
+
+            function formatCurrency(amount) {
+                return amount.toLocaleString("vi-VN", { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + " VND"; 
+            }
+        });
+    </script>
     @{
         <partial name="_ValidationScriptsPartial" />
     }

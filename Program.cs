@@ -12,6 +12,8 @@ using HotelApp.Models.User;
 using HotelApp.Areas.Identity.Pages.Account;
 
 var builder = WebApplication.CreateBuilder(args);
+// add Redis config from appsettings.json
+var redisConnectionString = builder.Configuration["Redis:ConnectionString"];
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -26,8 +28,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 // cấu hình DbContext
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
     options.UseSqlServer(connectionString));
-//builder.Services.AddDbContext<ApplicationDBContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // cấu hình Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -38,15 +39,13 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequiredLength = 6;
     options.Password.RequiredUniqueChars = 1;
     options.SignIn.RequireConfirmedAccount = false;
-    options.SignIn.RequireConfirmedEmail = false;    
+    options.SignIn.RequireConfirmedEmail = false;
     options.SignIn.RequireConfirmedPhoneNumber = false;
 })
     .AddRoles<IdentityRole>()
-    //.AddUserManager<UserManager<ApplicationUser>>()
-    //.AddSignInManager<SignInManager<ApplicationUser>>()
-    //.AddUserManager<UserManageProfile>()
     .AddEntityFrameworkStores<ApplicationDBContext>()
     .AddDefaultTokenProviders();
+
 
 // Thêm dịch vụ cho Razor Pages (để có giao diện UI)
 builder.Services.AddRazorPages();
@@ -61,8 +60,12 @@ builder.Services.AddScoped<UserManageProfile>();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddOptions();
 builder.Services.AddTransient<RegisterModel>();
+builder.Services.AddScoped<IVnPayService, VnPayService>(); // Thay đổi thành Scoped
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSession();
 
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -90,6 +93,7 @@ app.UseRouting();
 
 app.UseAuthentication(); // xác thực người dùng
 app.UseAuthorization(); // phân quyền
+app.UseSession();
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "areas",
@@ -100,6 +104,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}" // khi kh co area dc chi dinh
 );
-
 
 app.Run();

@@ -138,6 +138,25 @@ namespace HotelApp.Repository
             return query.FirstOrDefault();
         }
 
-       
+        public Room GetRoomFirstOrDefault(Expression<Func<Room, bool>> filter, Room defaultValue = null, string includeProperties = null)
+        {
+            IQueryable<Room> query = _dbContext.Rooms;
+
+            if(filter !=null)
+            {
+                query = query.Where(filter);
+            }
+            if(includeProperties != null)
+            {
+                foreach(var includeProperty in includeProperties.Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+            
+            var room = query.FirstOrDefault();
+            return room ?? defaultValue;
+            
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using HotelApp.Models.Hotel;
-using HotelApp.Models.Others;
+﻿
+using HotelApp.Models.Payment;
 
 namespace HotelApp.Repository.IRepository
 {

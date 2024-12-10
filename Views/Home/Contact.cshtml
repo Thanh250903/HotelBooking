@@ -1,6 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@model HotelApp.Models.User.Contact
+
+@{
+    ViewData["Title"] = "Contact";
+}
+
+<!DOCTYPE html>
 <html lang="en">
-    <head>
+<head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
@@ -25,8 +31,8 @@
 
     <!-- Template Stylesheet -->
     <link href="css/style.css" rel="stylesheet">
-    </head>
-    <body>
+</head>
+<body>
     <!--Header-->
     <div class="container-xxl bg-white p-0">
         <h1 class="display-3 text-dark mb-3 animated slideInDown text-center">Contact</h1>
@@ -40,36 +46,39 @@
                 <div class="col-12">
                 </div>
                 <div class="col-md-6 wow fadeIn" data-wow-delay="0.1s">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d958.4193167765357!2d108.23529336956892!3d16.082228699037444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31421827a3c439f5%3A0xdec2fb897aa16a90!2sGreenwich%20Vi%E1%BB%87t%20Nam!5e0!3m2!1sen!2s!4v1727253677559!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen="" aria-hidden="false"
-                            tabindex="0">
-                        </iframe>
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d958.4193167765357!2d108.23529336956892!3d16.082228699037444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31421827a3c439f5%3A0xdec2fb897aa16a90!2sGreenwich%20Vi%E1%BB%87t%20Nam!5e0!3m2!1sen!2s!4v1727253677559!5m2!1sen!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen="" aria-hidden="false" tabindex="0">
+                    </iframe>
                 </div>
                 <div class="col-md-6">
                     <div class="wow fadeInUp" data-wow-delay="0.2s">
-                        <form>
+                        <form asp-controller="Home" asp-action="SendEmail" method="post" id="contactForm">
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="name" placeholder="Your Name">
-                                        <label for="name">Your Name</label>
+                                        <input asp-for="Name" class="form-control" placeholder="Your Name" />
+                                        <label asp-for="Name"></label>
+                                        <span asp-validation-for="Name" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-floating">
-                                        <input type="email" class="form-control" id="email" placeholder="Your Email">
-                                        <label for="email">Your Email</label>
+                                        <input asp-for="Email" class="form-control" placeholder="Your Email" />
+                                        <label asp-for="Email"></label>
+                                        <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <input type="text" class="form-control" id="subject" placeholder="Subject">
-                                        <label for="subject">Subject</label>
+                                        <input asp-for="Subject" class="form-control" placeholder="Subject" />
+                                        <label asp-for="Subject"></label>
+                                        <span asp-validation-for="Subject" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <div class="form-floating">
-                                        <textarea class="form-control" placeholder="Leave a message here" id="message" style="height: 150px"></textarea>
-                                        <label for="message">Message</label>
+                                        <textarea asp-for="Message" class="form-control" placeholder="Leave a message here" style="height: 150px"></textarea>
+                                        <label asp-for="Message"></label>
+                                        <span asp-validation-for="Message" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-12">
@@ -77,12 +86,17 @@
                                 </div>
                             </div>
                         </form>
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="alert alert-success mt-3">
+                                @ViewBag.Message
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!--Footer-->
-    </div>
-    </body>
+</body>
 </html>

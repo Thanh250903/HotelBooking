@@ -16,7 +16,6 @@
     </script>
     TempData["ShowMessageEdit"] = false;
 }
-
 else if (TempData["ShowMessageDeleted"] != null && (bool)TempData["ShowMessageDeleted"] == true)
 {
     <div id="deleteUserMessage" class="alert alert-danger">@TempData["successDeleted"]</div>
@@ -27,7 +26,6 @@ else if (TempData["ShowMessageDeleted"] != null && (bool)TempData["ShowMessageDe
     </script>
     TempData["ShowMessageDeleted"] = false;
 }
-
 else if (TempData["ShowMessageResetPassword"] != null && (bool)TempData["ShowMessageResetPassword"] == true)
 {
     <div id="resetPasswordMessage" class="alert alert-info">@TempData["successResetPassword"]</div>
@@ -38,13 +36,21 @@ else if (TempData["ShowMessageResetPassword"] != null && (bool)TempData["ShowMes
     </script>
     TempData["ShowMessageResetPassword"] = false;
 }
-
 else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["ShowMessageLockAccount"].ToString(), out bool showMessageLockAccount) && showMessageLockAccount)
 {
     <div id="lockAccountMessage" class="alert alert-warning">@TempData["successLockAccount"]</div>
     <script>
         setTimeout(function () {
             $("#lockAccountMessage").fadeOut("slow");
+        }, 5000);
+    </script>
+}
+else if (TempData["ShowMessageUnlockAccount"] != null && bool.TryParse(TempData["ShowMessageUnlockAccount"].ToString(), out bool showMessageUnlockAccount) && showMessageUnlockAccount)
+{
+    <div id="unlockAccountMessage" class="alert alert-success">@TempData["successUnlockAccount"]</div>
+    <script>
+        setTimeout(function () {
+            $("#unlockAccountMessage").fadeOut("slow");
         }, 5000);
     </script>
 }
@@ -61,11 +67,10 @@ else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["S
                 <label for="myInput">
                     <ion-icon name="search-outline" style=" transform: translateY(0);"></ion-icon>
                 </label>
-                <input  id="myInput" class="form-control" type="text" placeholder="Search" style="margin-right: 30px;">
+                <input id="myInput" class="form-control" type="text" placeholder="Search" style="margin-right: 30px;">
             </form>
         </div>
         <div class="table-responsive">
-            <!-- Wrap the table in a div to enable horizontal scrolling on small screens -->
             <table class="table table-hover">
                 <thead id="tbHead" class="table-primary text-center">
                     <tr>
@@ -106,9 +111,18 @@ else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["S
                                         <a class="btn btn-danger" asp-area="Admin" asp-controller="Users" asp-action="DeleteUser" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
                                             <i class="fas fa-trash"></i> Delete
                                         </a>
-                                        <a class="btn btn-warning" asp-area="Admin" asp-controller="Users" asp-action="LockAccount" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
-                                            <i class="fas fa-user-lock"></i> Lock
-                                        </a>
+                                        @if (user.LockoutEnd == null || user.LockoutEnd <= DateTime.Now)
+                                        {
+                                            <a class="btn btn-warning" asp-area="Admin" asp-controller="Users" asp-action="LockAccount" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
+                                                <i class="fas fa-user-lock"></i> Lock
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a class="btn btn-success" asp-area="Admin" asp-controller="Users" asp-action="UnlockAccount" onclick="return confirm('Are you sure?')" asp-route-id="@user.Id">
+                                                <i class="fas fa-unlock"></i> Unlock
+                                            </a>
+                                        }
                                     }
                                 </div>
                             </td>
@@ -120,6 +134,7 @@ else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["S
         </div>
     </div>
 }
+
 @section Scripts {
     <script>
         $(document).ready(function () {
@@ -132,4 +147,4 @@ else if (TempData["ShowMessageLockAccount"] != null && bool.TryParse(TempData["S
             });
         });
     </script>
-} 
+}

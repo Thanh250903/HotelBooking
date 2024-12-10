@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace HotelApp.Models.Hotel
 {
@@ -28,7 +29,10 @@ namespace HotelApp.Models.Hotel
         public DateTime CheckOutDate { get; set; } // ngày đi
         [DataType(DataType.Currency)] // attributes kiểu tiền tệ
         [ValidateNever]
-        public decimal TotalPrice { get; set; }
-
+        public int TotalPrice { get; set; }
+        [ValidateNever]
+        public int PricePerNight { get; set; }
+        public bool IsPaid { get; set; } = false;
+       
     }
 }

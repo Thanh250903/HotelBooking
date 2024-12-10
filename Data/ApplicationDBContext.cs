@@ -1,6 +1,7 @@
 ﻿
 using HotelApp.Models.Hotel;
 using HotelApp.Models.Others;
+using HotelApp.Models.Payment;
 using HotelApp.Models.User;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

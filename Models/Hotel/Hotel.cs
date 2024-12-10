@@ -18,27 +18,15 @@ namespace HotelApp.Models.Hotel
         public string City { get; set; } // ksan đó nằm ở vị trí nào
         [ValidateNever]
         public int NumberPhone { get; set; } // sđt của khách sạn
-        [NotMapped] // kh lưu được ở trong CSDL và khi thêm khách sạn sẽ kh hiện trường này lên, nó sẽ lấy dữ liệu từ HotelReview
-        public double AverangeRating
-        {
-            get
-            {
-                if (HotelReviews != null && HotelReviews.Any())
-                {
-                    return HotelReviews.Average(review => review.Rating);
-                }
-                return 0; // Giá trị mặc định khi không có đánh giá nào
-            }
-        } // trường này đùng để tính toán số lượng Review đánh giá về khách sạn, không lưu trữ trong Database.
         public double Lattitube { get; set; } // kinh độ
         [ValidateNever]
         public double Longitude { get; set; } // vĩ độ
         [ValidateNever]
-        public string? ImageUrl { get; set; } // đường dẫn ảnh
+        public string? ImageUrl { get; set; } // hình ảnh đại diện cho khách sạn
         [ValidateNever]
         public ICollection<Room>? Rooms { get; set; } // tùy thuộc vào tình trạng phòng để quản lý phòng dễ dàng hơn, cho phép đặt phòng trực tuyến và chọn phòng như ý muốn
         public ICollection<RoomBooking>? RoomBookings { get; set; } // set với RoomBooking
-        public ICollection<HotelReview>? HotelReviews { get; set; } // danh sách về các đánh giá của khách sạn
-        public string OwnerId {  get; set; }
+        public IEnumerable<HotelReview>? HotelReviews { get; set; } // danh sách về các đánh giá của khách sạn
+        public string? OwnerId {  get; set; }
     }
 }

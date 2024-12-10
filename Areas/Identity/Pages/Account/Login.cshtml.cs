@@ -91,7 +91,7 @@ namespace HotelApp.Areas.Identity.Pages.Account
                         {
                             return RedirectToAction("Index", "Home", new { area = "Staff" });
                         }
-                        else if (await _userManager.IsInRoleAsync(user, "User"))
+                        else if (await _userManager.IsInRoleAsync(user, "Users"))
                         {
                             return RedirectToAction("Index", "Home", new { area = "Users" });
                         }
